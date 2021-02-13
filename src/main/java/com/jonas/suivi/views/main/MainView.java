@@ -3,18 +3,20 @@ package com.jonas.suivi.views.main;
 import java.util.Optional;
 
 import com.jonas.suivi.views.about.AboutView;
-import com.jonas.suivi.views.helloworld.HelloWorldView;
+import com.jonas.suivi.views.helloworld.HomeView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -22,6 +24,10 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.server.Command;
+import com.vaadin.flow.server.WrappedSession;
+
+import io.swagger.codegen.v3.service.exception.ApiException;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -38,23 +44,9 @@ public class MainView extends AppLayout {
         addToNavbar(true, createHeaderContent());
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
-        createHeader();
     }
     
-    private void createHeader() {
-        H1 logo = new H1("Vaadin CRM");
-        logo.addClassName("logo");
-
-        Anchor logout = new Anchor("logout", "Log out"); 
-
-        HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo, logout); 
-        header.expand(logo); 
-        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        header.setWidth("100%");
-        header.addClassName("header");
-
-        addToNavbar(header);
-    }
+   
     
 
     private Component createHeaderContent() {
@@ -66,8 +58,34 @@ public class MainView extends AppLayout {
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.add(new DrawerToggle());
         viewTitle = new H1();
+        
+        HorizontalLayout btnLayout = new HorizontalLayout();
+        btnLayout.getThemeList().set("dark", true);
+        btnLayout.setWidthFull();
+        btnLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        btnLayout.setAlignItems(Alignment.END);
+        
+        Button btnLogout = new Button();
+        btnLogout.addClickListener(c ->{
+
+        	UI.getCurrent().accessSynchronously(new Command() {
+				
+				@Override
+				public void execute() {
+					UI.getCurrent().getPage().setLocation("logout");
+				}
+			});
+        	UI.getCurrent().close();
+        
+        });
+        btnLogout.setText("Logout");
+        
+        btnLayout.add(btnLogout);
+        
         layout.add(viewTitle);
+        layout.add(btnLayout);
         layout.add(new Avatar());
+        
         return layout;
     }
 
@@ -97,7 +115,7 @@ public class MainView extends AppLayout {
     }
 
     private Component[] createMenuItems() {
-        return new Tab[]{createTab("Hello World", HelloWorldView.class), createTab("About", AboutView.class)};
+        return new Tab[]{createTab("Hello World", HomeView.class), createTab("About", AboutView.class)};
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {

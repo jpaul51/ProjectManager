@@ -1,4 +1,4 @@
-package com.jonas.suivi.data;
+package com.jonas.suivi.backend.model;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -9,13 +9,13 @@ public abstract class AbstractEntity {
 
     @Id
     @GeneratedValue
-    private Integer id;
+    private Long id;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
