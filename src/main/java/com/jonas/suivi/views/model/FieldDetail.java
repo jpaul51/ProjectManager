@@ -21,6 +21,8 @@ public class FieldDetail {
 	String fontColor;
 	String bgColor;
 	
+	boolean isValueHidden;
+	
 	Object defaultValue;
 
 	public String getType() {
@@ -103,6 +105,16 @@ public class FieldDetail {
 
 	public void setValueProviders(List<Class<? extends Enum>> valueProviders) {
 		this.valueProviders = valueProviders;
+	}
+
+	
+	
+	public boolean isValueHidden() {
+		return isValueHidden;
+	}
+
+	public void setValueHidden(boolean isValueHidden) {
+		this.isValueHidden = isValueHidden;
 	}
 
 	@Override

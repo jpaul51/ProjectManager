@@ -10,15 +10,13 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import com.jonas.suivi.backend.model.AbstractEntity;
 import com.jonas.suivi.backend.model.Displayable;
-import com.vaadin.flow.function.ValueProvider;
 
 @Entity
-public class Intervention extends AbstractEntity implements Serializable, Displayable {
+public class Intervention implements Serializable, Displayable {
 
-
-	
+	@Id @GeneratedValue
+	Long id;
 	private String description;
 	private String commentaire;
 	
@@ -149,9 +147,15 @@ public class Intervention extends AbstractEntity implements Serializable, Displa
 	}
 
 
+	@Override
+	public Long getId() {
+		return id;
+	}
 
 
-
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 
 

@@ -6,12 +6,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import com.jonas.suivi.backend.model.AbstractEntity;
 import com.jonas.suivi.backend.model.Displayable;
 
 @Entity
-public class Person extends AbstractEntity implements Serializable, Displayable {
+public class Person  implements Serializable, Displayable {
 
+	@Id @GeneratedValue
+	Long id;
 	private String login;
 	private String firstName;
 	private String lastName;
@@ -96,6 +97,12 @@ public class Person extends AbstractEntity implements Serializable, Displayable 
 	@Override
 	public String getLabel() {
 		return firstName.concat(" ").concat(lastName);
+	}
+
+	@Override
+	public Long getId() {
+		// TODO Auto-generated method stub
+		return id;
 	}
 	
 

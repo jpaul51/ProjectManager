@@ -7,18 +7,19 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import com.jonas.suivi.backend.model.AbstractEntity;
 import com.jonas.suivi.backend.model.Displayable;
 import com.jonas.suivi.backend.model.Name;
 
 @Entity
-public class Project extends AbstractEntity  implements Serializable, Displayable {
+public class Project   implements Serializable, Displayable {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4807833043624930166L;
 	
+	@Id @GeneratedValue
+	Long id;
 	@Name("name")
 	private String name;
 	@Name("description")
@@ -70,6 +71,12 @@ public class Project extends AbstractEntity  implements Serializable, Displayabl
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public Long getId() {
+		// TODO Auto-generated method stub
+		return id;
 	}
 
 

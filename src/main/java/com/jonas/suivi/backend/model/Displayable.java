@@ -9,6 +9,7 @@ public interface Displayable extends Serializable{
 	
 	public String getLabel();
 	
+	public Long getId();
 	
 	
 //	public void setValue();

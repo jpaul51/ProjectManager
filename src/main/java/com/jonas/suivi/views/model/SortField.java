@@ -14,7 +14,7 @@ public class SortField {
 		DESC
 	}
 	
-	List<Map<FieldDetail, SortType>> sortingByField;
+	List<Map<FieldDetail, SortType>> sortingByField = new ArrayList<>();
 	
 	
 	public SortField() {

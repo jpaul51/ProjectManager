@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 public @interface Input {
 	
 
+
 	String value() default TEXT_INPUT;
 
 	
@@ -32,6 +33,7 @@ public @interface Input {
 	
 	public static String SELECT = "SELECT";
 
+	public static String CHECK_INPUT = "CHECK_INPUT";
 
 }
 

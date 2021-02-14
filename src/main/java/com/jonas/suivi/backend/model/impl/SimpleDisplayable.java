@@ -4,10 +4,9 @@ import java.io.Serializable;
 
 import javax.persistence.Id;
 
-import com.jonas.suivi.backend.model.AbstractEntity;
 import com.jonas.suivi.backend.model.Displayable;
 
-public class SimpleDisplayable extends AbstractEntity  implements Serializable, Displayable {
+public class SimpleDisplayable   implements Serializable, Displayable {
 
 	
 	@Id

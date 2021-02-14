@@ -11,7 +11,7 @@ public class ResultView {
 	List<FieldDetail> columns = new ArrayList<>();
     Set<FieldDetail> quickSearchList = new HashSet<>();
 
-	
+	SortField sortField = new SortField();
 	
 	
 	public ResultView() {
@@ -43,6 +43,18 @@ public class ResultView {
 	public void setQuickSearchList(Set<FieldDetail> quickSearchList) {
 		this.quickSearchList = quickSearchList;
 	}
+
+
+	public SortField getSortField() {
+		return sortField;
+	}
+
+
+	public void setSortField(SortField sortField) {
+		this.sortField = sortField;
+	}
+	
+	
 	
 	
 	

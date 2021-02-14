@@ -14,6 +14,7 @@ import com.jonas.suivi.backend.model.impl.Intervention;
 import com.jonas.suivi.backend.model.impl.Person;
 import com.jonas.suivi.backend.model.impl.Project;
 import com.jonas.suivi.backend.model.impl.Translation;
+import com.jonas.suivi.backend.model.impl.UserAccount;
 
 @Component
 public class ServiceProxy implements ApplicationContextAware{
@@ -36,6 +37,10 @@ public class ServiceProxy implements ApplicationContextAware{
 	@Qualifier("Translation")
 	private TranslationService translationService;
 
+	@Autowired 
+	@Qualifier("Account")
+	private UserAccountService userAccountService;
+
 	
 	
 	
@@ -43,6 +48,7 @@ public class ServiceProxy implements ApplicationContextAware{
 		PROJECT("Project", Project.class),
 	    INTERVENTION("Intervention", Intervention.class),
 	    PERSON("Person", Person.class),
+	    ACCOUNT("Account", UserAccount.class),
 	    TRANSLATION("Translation", Translation.class);
 
 	    private String serviceName;
