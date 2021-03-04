@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import com.jonas.suivi.UserContextFactory;
 import com.jonas.suivi.views.about.AboutView;
-import com.jonas.suivi.views.components.container.PushyView;
 import com.jonas.suivi.views.descriptors.InterventionDescriptor;
 import com.jonas.suivi.views.descriptors.PersonDescriptor;
 import com.jonas.suivi.views.descriptors.ProjectDescriptor;
@@ -36,6 +35,7 @@ import com.vaadin.flow.router.HighlightCondition;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.Command;
+import com.vaadin.flow.server.PWA;
 
 /**
  * The main view is a top-level placeholder for other views.

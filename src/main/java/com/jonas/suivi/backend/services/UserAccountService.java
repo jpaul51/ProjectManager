@@ -30,21 +30,24 @@ public class UserAccountService implements DisplayableService{
 	}
 	
 	public void updatePassword(String password) {
-		PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-
+		
 		UserAccount usr = getUsrLoggedAccount();
-		usr.setPassword(encoder.encode(password));
+		encodePassword(password, usr);
 		usr.setResetPassword(false);
 		usrAccountRepo.save(usr);
 	}
 
+	private void encodePassword(String password, UserAccount usr) {
+		PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+		usr.setPassword(encoder.encode(password));
+	}
+
 	public void initialize() {
 
-		PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 		
 		UserAccount admin = new UserAccount();
 		admin.setLogin("admin");
-		admin.setPassword(encoder.encode("admin"));
+		encodePassword("admin",admin);
 		admin.setResetPassword(true);
 		usrAccountRepo.save(admin);
 	}
@@ -60,6 +63,13 @@ public class UserAccountService implements DisplayableService{
 		return (List<T>) usrAccountRepo.findAll();
 	}
 
+	@Override
+	public <T extends Displayable> void create(T d) {
+		UserAccount usrAcc = (UserAccount) d;
+		encodePassword(usrAcc.getPassword(), usrAcc);
+		usrAccountRepo.save(usrAcc);		
+	}
+	
 	@Override
 	public <T extends Displayable> void update(T d) {
 		usrAccountRepo.save((UserAccount) d);		

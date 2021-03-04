@@ -1,9 +1,7 @@
 package com.jonas.suivi.views.model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class Application {
@@ -16,7 +14,11 @@ public class Application {
 	
 	
     List<Action> action = new ArrayList<>();
+  
     
+    public Application() {
+    	tlManager = new TableLayoutManager();
+	}
     
 	private boolean noTable;
 

@@ -5,10 +5,14 @@ import java.util.List;
 
 public class Detail {
 
+	public enum DetailType{
+		NEW,
+		UPDATE
+	}
 	
 	String detailName = "default";
 	List<Bloc> blocs = new ArrayList<>();
-	
+	DetailType detailType;
 	
 
 	public String getDetailName() {
@@ -25,6 +29,16 @@ public class Detail {
 
 	public void setBlocs(List<Bloc> blocs) {
 		this.blocs = blocs;
+	}
+	
+	
+
+	public DetailType getDetailType() {
+		return detailType;
+	}
+
+	public void setDetailType(DetailType detailType) {
+		this.detailType = detailType;
 	}
 
 	@Override

@@ -17,6 +17,10 @@ public interface DisplayableService {
 	
 	public <T extends Displayable> void delete(T d);
 	
+	public default <T extends Displayable> void create(T d) {
+		update(d);
+	}
+	
 	public <T extends Displayable> Optional<T> getByIdentifier(String d);
 	
 	

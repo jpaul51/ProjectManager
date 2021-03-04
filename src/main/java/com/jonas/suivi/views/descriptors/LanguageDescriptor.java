@@ -6,7 +6,7 @@ public class LanguageDescriptor extends Application{
 	
 
 	public LanguageDescriptor() {
-		
+		super();
 		setAppLabelKey(EAppTranslation.APP_LABEL_LANGUAGE.name());
 		setAppName("languages");
 		

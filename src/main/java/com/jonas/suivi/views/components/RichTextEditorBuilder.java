@@ -3,41 +3,46 @@ package com.jonas.suivi.views.components;
 
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.textfield.TextArea;
+import com.wontlost.ckeditor.Constants.EditorType;
+import com.wontlost.ckeditor.Constants.Language;
+import com.wontlost.ckeditor.Constants.ThemeType;
+import com.wontlost.ckeditor.VaadinCKEditor;
+import com.wontlost.ckeditor.VaadinCKEditorBuilder;
 
 @CssImport("./main.css")
 public  class RichTextEditorBuilder extends TextArea  {
 	
 	
 
-//	public static VaadinCKEditor richTextEditor(String data) {
-//		
-//		VaadinCKEditor classicEditor = new VaadinCKEditorBuilder().with(builder -> {
-//			builder.editorData = "<p>This is a classic editor sample.</p>";
-//			builder.editorType = EditorType.CLASSIC;
+	public static VaadinCKEditor richTextEditor(String data) {
+		
+		VaadinCKEditor classicEditor = new VaadinCKEditorBuilder().with(builder -> {
+			builder.editorData = "<p>This is a classic editor sample.</p>";
+			builder.editorType = EditorType.CLASSIC;
 //			builder.uiLanguage = Language.fr;
-////			builder.config = new Config();
-////			builder.config.setUILanguage(com.wontlost.ckeditor.Constants.Language.fr);
-////			
-////			builder.config.switchResizeEnabled(true);
-////		    builder.uiLanguage = Language.fr; //language defaulted to 'en'
-//		    builder.theme = ThemeType.DARK;
-////		    builder.toolbar = builder.toolbar=new Toolbar[]{Toolbar.fontFamily, Toolbar.fontSize, Toolbar.fontColor,
-////		    		Toolbar.codeBlock, Toolbar.insertTable};
-//		}).createVaadinCKEditor();
-////		classicEditor.getElement().setProperty("config", "");
-//		classicEditor.setValue(data);
-//		
-////		CKEditorConfig config = new CKEditorConfig();
-////		config.useCompactTags();
-////		config.disableElementsPath();
-////		config.setResizeDir(CKEditorConfig.RESIZE_DIR.HORIZONTAL);
-////		config.disableSpellChecker();
-////		config.setWidth("100%");
-//		
-//		classicEditor.setValue(data);
-//		
-//		return classicEditor;
-//	}
+//			builder.config = new Config();
+//			builder.config.setUILanguage(com.wontlost.ckeditor.Constants.Language.fr);
+//			
+//			builder.config.switchResizeEnabled(true);
+//		    builder.uiLanguage = Language.fr; //language defaulted to 'en'
+		    builder.theme = ThemeType.DARK;
+//		    builder.toolbar = builder.toolbar=new Toolbar[]{Toolbar.fontFamily, Toolbar.fontSize, Toolbar.fontColor,
+//		    		Toolbar.codeBlock, Toolbar.insertTable};
+		}).createVaadinCKEditor();
+//		classicEditor.getElement().setProperty("config", "");
+		classicEditor.setValue(data);
+		
+//		CKEditorConfig config = new CKEditorConfig();
+//		config.useCompactTags();
+//		config.disableElementsPath();
+//		config.setResizeDir(CKEditorConfig.RESIZE_DIR.HORIZONTAL);
+//		config.disableSpellChecker();
+//		config.setWidth("100%");
+		
+		classicEditor.setValue(data);
+		
+		return classicEditor;
+	}
 
 //	public static VaadinCKEditor richTextEditor(String data, boolean readOnly) {
 //		VaadinCKEditor richEditor =  richTextEditor(data);

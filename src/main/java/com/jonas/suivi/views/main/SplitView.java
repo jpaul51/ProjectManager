@@ -38,16 +38,21 @@ import com.jonas.suivi.views.components.TextFieldComponent;
 import com.jonas.suivi.views.components.TimeComponent;
 import com.jonas.suivi.views.components.container.PushyView;
 import com.jonas.suivi.views.descriptors.EAppFieldsTranslation;
+import com.jonas.suivi.views.descriptors.FunctionalInterfaceLocalDateTime;
 import com.jonas.suivi.views.descriptors.InvalidActionDescriptorException;
 import com.jonas.suivi.views.descriptors.InvalidFieldDescriptorException;
 import com.jonas.suivi.views.descriptors.MainEntity;
 import com.jonas.suivi.views.model.Action;
 import com.jonas.suivi.views.model.ActionType;
 import com.jonas.suivi.views.model.Application;
+import com.jonas.suivi.views.model.Bloc;
+import com.jonas.suivi.views.model.Detail;
+import com.jonas.suivi.views.model.Detail.DetailType;
 import com.jonas.suivi.views.model.FieldDetail;
+import com.jonas.suivi.views.model.FieldDetailList;
 import com.jonas.suivi.views.model.Input;
+import com.jonas.suivi.views.model.Line;
 import com.jonas.suivi.views.model.ResultView;
-import com.jonas.suivi.views.model.SortField;
 import com.jonas.suivi.views.model.TableLayoutManager;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
@@ -70,6 +75,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -89,13 +95,11 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 	@Autowired
 	ServiceProxy serviceProxy;
 
-//	HashSet<Component> components;
 
 	DisplayableService displayableService;
 
-    Label labelId = new Label();
+	Label labelId = new Label();
 
-	
 	/**
 	 * 
 	 */
@@ -110,33 +114,36 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 
 	private Binder<Displayable> binder;
 
-	private Button cancel ;
-	private Button btnSave ;
+	private Button cancel;
+	private Button btnSave;
 	private Button btnDelete;
 
 	Application application;
 
-	FormLayout formLayout = new FormLayout();
-	List<SuperComponentInterface<?,? extends Component>> formComponents;
+	EAPP_CONTEXT appCtx = EAPP_CONTEXT.ADD;
 
-	HashMap<FieldDetail, SuperComponentInterface<?,? extends Component>> componentsByField;
+	FormLayout formLayout = new FormLayout();
+	List<SuperComponentInterface<?, ? extends Component>> formComponents;
+
+	HashMap<FieldDetail, SuperComponentInterface<?, ? extends Component>> componentsByField;
 
 	SplitLayout splitLayout;
 	Div toolbar;
 
 	Displayable currentDisplayable;
 	List<Displayable> displayables = new ArrayList<>();
-	
+	List<Displayable> filteredDisplayables = new ArrayList<>();
+
+
 	List<PushyView> lazyComponents = new ArrayList<>();
 
 	HashMap<FieldDetail, PropertyDescriptor> propDescriptorByField = new HashMap<>();
 
-	
 	public SplitView() throws InvalidFieldDescriptorException, InvalidActionDescriptorException {
 		super();
 
 		generateView();
-		
+
 	}
 
 	private void generateView() throws InvalidFieldDescriptorException, InvalidActionDescriptorException {
@@ -146,7 +153,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		btnDelete = new Button("Delete");
 		formComponents = new ArrayList<>();
 		componentsByField = new HashMap<>();
-		
+
 		Class<?> cl = UserContextFactory.getCurrentUserContext().getCurrentClass();
 		if (cl != null) {
 			pageTitle = cl.getName();
@@ -160,20 +167,19 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 			}
 
 		}
-		if(viewClazz == null) {
+		if (viewClazz == null) {
 			UI.getCurrent().navigate("");
 		}
-		if(viewClazz.getAnnotation(MainEntity.class) == null) {
+		if (viewClazz.getAnnotation(MainEntity.class) == null) {
 			UI.getCurrent().navigate("");
 
 		}
 		modelClazz = viewClazz.getAnnotation(MainEntity.class).value();
-		
-		Class<Displayable> clazz = (Class<Displayable>) modelClazz;
-		
-        UI.getCurrent().getPage().getHistory().pushState(null, "");
 
-		
+		Class<Displayable> clazz = (Class<Displayable>) modelClazz;
+
+		UI.getCurrent().getPage().getHistory().pushState(null, "app");
+
 		binder = new Binder<>(clazz);
 //		binder.wr
 
@@ -194,100 +200,112 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		vl.getStyle().set("overflow-x", "hidden");
 		splitLayout.addToPrimary(vl);
 		splitLayout.setSizeFull();
-		createEditorLayout(splitLayout);
 
 		TableLayoutManager tlManager = application.getTlManager();
 
 //		if (tlManager == null && !application.isNoTable()) {
 
-			tlManager = new TableLayoutManager();
-			ResultView resultView = tlManager.getDefaultResultView();
-			
-			if(resultView.getColumns().isEmpty()) {
-				resultView.setColumns(application.getAllFields());
-			}
-			
+		tlManager = new TableLayoutManager();
+		ResultView resultView = tlManager.getDefaultResultView();
+
+		if (resultView.getColumns().isEmpty()) {
+			resultView.setColumns(application.getAllFields());
+		}
+
 //			tlManager.setColumns(application.getAllFields());
 
 //		}
 
 		for (FieldDetail column : resultView.getColumns()) {
-			if(column.getName() == null) {
+			if (column.getName() == null) {
 				throw new InvalidFieldDescriptorException("Field name is mandatory and must match a field");
-			} 
-			if(column.getTranslationKey() == null) {
+			}
+			if (column.getTranslationKey() == null) {
 				throw new InvalidFieldDescriptorException("Field translation key is mandatory");
-			} 
-			
+			}
+
 			Column c;
-			if(column.getType().equals(Input.TEXT_RICH)) {
+			if (column.getType().equals(Input.TEXT_RICH)) {
 				c = grid.addColumn(new ComponentRenderer<>(disp -> {
-					
+
 					StringBuilder stringcontent = new StringBuilder("<div class='htmlContainer'>");
-					
+
 					Optional<Object> valueProvided = createGridColumns(column, disp);
-					
-					
+
 					stringcontent.append(valueProvided.isPresent() ? valueProvided.get() : "")
-					
-					
-					.append("</div>");
-					
-	        		Html content = new Html(stringcontent.toString());           		
+
+							.append("</div>");
+
+					Html content = new Html(stringcontent.toString());
 					return content;
-					
-					}));
-			}else if(column.getType().equals(Input.DATE_TIME)) {
+
+				}));
+			} else if (column.getType().equals(Input.DATE_TIME)) {
 				c = grid.addColumn(new ComponentRenderer<>(disp -> {
-	        		Div d = new Div();
+					Div d = new Div();
 //	        		LocalDateTime
-	        		DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
-	        		formatter = formatter.localizedBy(TranslationUtils.locale);
-	        		
-	        		Optional<Object> providedValue = createGridColumns(column,disp);
-	        		
-	        		StringBuilder value;
-	        		
-	        		if(providedValue.isPresent()) {
-	        			value =new StringBuilder().append(((LocalDateTime) providedValue.get() ).format(formatter));
-	        		}else {
-	        			value =new StringBuilder();
-	        		}
-	        		d.add(new Label((value.toString())));
-					return d;					
-					}));
-			}else {
+					DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+					formatter = formatter.localizedBy(TranslationUtils.locale);
+
+					Optional<Object> providedValue = createGridColumns(column, disp);
+
+					StringBuilder value;
+
+					if (providedValue.isPresent()) {
+						value = new StringBuilder().append(((LocalDateTime) providedValue.get()).format(formatter));
+					} else {
+						value = new StringBuilder();
+					}
+					Label l = new Label(value.toString());
+//					l.getStyle().clear().set("background-transparency", value)
+					l.getStyle().clear().set("pointer-events", "none");
+					
+					d.add(l);
+					return d;
+				}));
+			} else {
 				c = grid.addColumn(createGridColumns(column));
 			}
-			
+
 			HtmlComponent htmlHeader = new HtmlComponent(Tag.H3);
 			htmlHeader.getElement().setText(TranslationUtils.translate(column.getTranslationKey()));
 			htmlHeader.addClassName("gridHeader");
 			c.setHeader(htmlHeader);
-			
-			createBinder(column);
 
 		}
-		
-		for(Action ac : application.getAction()) {
-			if(ac.getActionType() == null) {
+
+		generateDetail();
+
+		for (Action ac : application.getAction()) {
+			if (ac.getActionType() == null) {
 				throw new InvalidActionDescriptorException("Actiontype is mandatory");
 			}
-			//TODO: gérer les actions onchange et similaires
+			// TODO: gérer les actions onchange et similaires
 		}
-		
+
 		this.pageTitle = TranslationUtils.translate(this.application.getAppLabelKey());
 
 		grid.addSelectionListener(e -> {
 			Optional<Displayable> oDisplayable = e.getFirstSelectedItem();
 			if (oDisplayable.isPresent()) {
+
+				final EAPP_CONTEXT currentCtx = appCtx;
+
+				appCtx = EAPP_CONTEXT.UPDATE;
+
+				
+				if (!currentCtx.equals(EAPP_CONTEXT.UPDATE)) {
+					generateDetail();
+				}
+
+				
 				e.getSource().select(oDisplayable.get());
 				populateForm(oDisplayable.get());
 				splitLayout.getSecondaryComponent().setVisible(true);
 				splitLayout.setSplitterPosition(70);
-				
+
 				loadLazyComponents();
-				
+
 			}
 		});
 
@@ -298,8 +316,48 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		this.add(splitLayout);
 	}
 
+	private void generateDetail() {
+		Detail currentDt = null;
+		Optional<Detail> currentDtOpt = appCtx.equals(EAPP_CONTEXT.ADD)
+				? (application.getDlManager().getDetails().stream()
+						.filter(d -> DetailType.NEW.equals(d.getDetailType())).findFirst())
+				: (application.getDlManager().getDetails().stream()
+						.filter(d -> DetailType.UPDATE.equals(d.getDetailType())).findFirst());
+		if (currentDtOpt.isEmpty()) {
+			currentDt = application.getDlManager().getDefaultDetail();
+		} else {
+			currentDt = currentDtOpt.get();
+		}
+
+		binder = new Binder(this.modelClazz);
+		componentsByField = new HashMap<>();
+		formComponents = new ArrayList<SuperComponentInterface<?,? extends Component>>();
+//		this.splitLayout.getSecondaryComponent().
+		formLayout = new FormLayout();
+		
+		createEditorLayout(splitLayout);
+//		createButtonLayout(editorDiv);
+		
+//		this.splitLayout.addToSecondary(formLayout);
+		for (Bloc b : currentDt.getBlocs()) {
+
+			for (Line l : b.getLines()) {
+
+				for (FieldDetail f : l.getFields()) {
+
+					createBinder(f);
+
+				}
+
+			}
+
+		}
+			reloadEntityComponents();
+
+	}
+
 	private void loadLazyComponents() {
-		for(PushyView view : lazyComponents) {
+		for (PushyView view : lazyComponents) {
 			view.perform();
 		}
 	}
@@ -307,30 +365,30 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 	private Optional<Object> createGridColumns(FieldDetail column, Displayable disp) {
 		String fieldName = column.getName();
 
-		Optional ret ;
-		
+		Optional ret;
+
 		PropertyDescriptor pd = null;
 		try {
-		for (Field field : modelClazz.getDeclaredFields()) {
-			if (field.getAnnotation(Name.class) != null) {
-				String currfieldName = field.getAnnotation(Name.class).value();
-				if (currfieldName.equals(fieldName)) {
-					fieldName = currfieldName;
-					pd = new PropertyDescriptor(currfieldName, modelClazz);
+			for (Field field : modelClazz.getDeclaredFields()) {
+				if (field.getAnnotation(Name.class) != null) {
+					String currfieldName = field.getAnnotation(Name.class).value();
+					if (currfieldName.equals(fieldName)) {
+						fieldName = currfieldName;
+						pd = new PropertyDescriptor(currfieldName, modelClazz);
+					}
 				}
 			}
-		}
-		if (pd == null) {
-			pd = new PropertyDescriptor(fieldName, modelClazz);
-		}
-		propDescriptorByField.put(column, pd);
-		
-		Object res = pd.getReadMethod().invoke(disp); 
-		
-		ret = Optional.ofNullable(res);
-		
-		return ret;
-		}catch(Exception e) {
+			if (pd == null) {
+				pd = new PropertyDescriptor(fieldName, modelClazz);
+			}
+			propDescriptorByField.put(column, pd);
+
+			Object res = pd.getReadMethod().invoke(disp);
+
+			ret = Optional.ofNullable(res);
+
+			return ret;
+		} catch (Exception e) {
 			e.printStackTrace();
 			return Optional.empty();
 		}
@@ -351,13 +409,61 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		toolbar.add(hl);
 
 		btnAdd.addClickListener(e -> {
+
+			final EAPP_CONTEXT currentCtx = appCtx;
+
+			
+			appCtx = EAPP_CONTEXT.ADD;
+			if (!currentCtx.equals(EAPP_CONTEXT.ADD)) {
+				generateDetail();
+			}
+
 			populateForm(null);
 			grid.deselectAll();
 			grid.asSingleSelect().clear();
 			splitLayout.getSecondaryComponent().setVisible(true);
 			loadLazyComponents();
 		});
-
+//		SearchBox ss = new SearchBox(null, null);
+//		ss.ic
+		
+		TextField sbox = new TextField();
+		sbox.setSuffixComponent(new Icon(VaadinIcon.SEARCH));
+//		sbox.setSearchMode(SearchMode.EXPLICIT);
+		sbox.addKeyPressListener(Key.ENTER, sf -> {
+			String searchedValue = sbox.getValue();
+			filteredDisplayables.clear();
+			filteredDisplayables.addAll(displayables.stream().filter(d ->{
+//				boolean isQuaified = false;
+				return application.getTlManager().getDefaultResultView().getQuickSearchList().stream().anyMatch(f ->{
+					try {
+						Object displayableValue = propDescriptorByField.get(f).getReadMethod().invoke(d);
+						
+						if(((String)displayableValue).toLowerCase().contains(searchedValue.toLowerCase().strip())) {
+							
+							return true;
+						}else {
+							return false;
+						}
+						
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						return false;
+					}
+				});
+				
+				
+				
+			
+			}).collect(Collectors.toList()));
+			grid.setItems(filteredDisplayables);
+		});
+		Div searchDiv = new Div();
+		searchDiv.add(sbox);
+		sbox.focus();
+		hl.add(searchDiv);
+		
 		toolbar.getStyle().set("padding", "var(--lumo-space-s) var(--lumo-space-l)");
 		toolbar.getStyle().set("border-right", "10px");
 		toolbar.getStyle().set("border-color", "#66a8ff");
@@ -366,12 +472,18 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		return vl;
 	}
 
+	private void reloadEntityComponents() {
+		findEntityFieldsComponents().stream().forEach(s -> {
+			s.initializeList(serviceProxy);
+		});
+	}
+
 	private void populateForm(Displayable object) {
 		if (object == null) {
-			labelId.setText(EAppFieldsTranslation.APP_FIELDS_ADD.name().concat(" ").concat(pageTitle));
+			labelId.setText(TranslationUtils.translate(EAppFieldsTranslation.APP_FIELDS_ADD.name()).concat(" ").concat(TranslationUtils.translate(pageTitle)));
 			currentDisplayable = null;
-			for (SuperComponentInterface<?,? extends Component> disp : formComponents) {
-				disp.setValue(null);
+			for (SuperComponentInterface<?, ? extends Component> disp : formComponents) {
+				disp.initialize();;
 			}
 		} else {
 
@@ -399,7 +511,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 						}
 					}
 				}
-				
+
 				if (pd == null) {
 					pd = new PropertyDescriptor(fieldName, modelClazz);
 				}
@@ -414,18 +526,20 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		};
 	}
 
-
 	private void createBinder(FieldDetail field) {
+
+		
+		
 		
 		String translatedFieldLabel = TranslationUtils.translate(field.getTranslationKey());
 
 		String fieldType = field.getType();
-		if(fieldType == null) {
+		if (fieldType == null) {
 			fieldType = Input.TEXT_INPUT;
 		}
-		
-		SuperComponentInterface<?,?> component;
-		 
+
+		SuperComponentInterface<?, ?> component;
+
 		switch (fieldType) {
 
 //		case Input.TEXT_INPUT_MULTIPLE:
@@ -433,30 +547,31 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 //			break;		
 		case Input.TEXT_RICH:
 			component = new RichTextEditorComponent(field);
-			lazyComponents.add((PushyView)component.getComponent());
+			component.getComponent().getElement().setAttribute("colspan", "2");
+			lazyComponents.add((PushyView) component.getComponent());
 			break;
-		
+
 		case Input.TEXT_AREA:
 			component = new TextAreaComponent(field, translatedFieldLabel);
 			break;
-			
+
 		case Input.CHECK_INPUT:
 			component = new CheckComponent(field, translatedFieldLabel);
 			break;
-			
+
 		case Input.SELECT:
 			try {
-				component = new SelectComponent<>( field, viewClazz);
-			}catch(InvalidFieldDescriptorException e) {
+				component = new SelectComponent<>((FieldDetailList)field, viewClazz);
+			} catch (InvalidFieldDescriptorException e) {
 				e.printStackTrace();
 				component = new LabelComponent(field, e.getLocalizedMessage());
 			}
 			break;
-			
+
 		case Input.DATE_TIME:
 			try {
 				component = new DateTimeComponent(field);
-			}catch(InvalidFieldDescriptorException e) {
+			} catch (InvalidFieldDescriptorException e) {
 				e.printStackTrace();
 				component = new LabelComponent(field, e.getLocalizedMessage());
 			}
@@ -473,6 +588,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		component.setFieldDetail(field);
 		component.setReadOnly(field.getReadOnly());
 
+		
 		binder.forField(component).bind(field.getName());
 		componentsByField.put(field, component);
 		formComponents.add(component);
@@ -480,6 +596,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 	}
 
 	private void createEditorLayout(SplitLayout splitLayout) {
+		
 		Div panelDiv = new Div();
 		createButtonLayout(panelDiv);
 		panelDiv.setId("editor-layout");
@@ -508,44 +625,45 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 
 		HorizontalLayout labelLayout = new HorizontalLayout();
 //	        labelId.setVisible(false);
-	        labelLayout.add(labelId);
-	       
+		labelLayout.add(labelId);
+
 		labelLayout.getClassNames().add("editorHeader");
 
 		headerLayout.getClassNames().add("header-layout");
 		headerLayout.setId("header-layout");
 		headerLayout.setWidthFull();
 		headerLayout.setSpacing(true);
-		
+
 		cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 		btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		btnDelete.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-		
-		HorizontalLayout buttonLayout = new HorizontalLayout(); 
-		buttonLayout .add(btnDelete, cancel, btnSave);
-		buttonLayout.getClassNames().add("button-layout"); 
+
+		HorizontalLayout buttonLayout = new HorizontalLayout();
+		buttonLayout.add(btnDelete, cancel, btnSave);
+		buttonLayout.getClassNames().add("button-layout");
 //		labelLayout.setAlignItems(Alignment.START);
 		labelLayout.getClassNames().add("label-layout");
-		
+
 		btnDelete.addClickListener(c -> {
 			deleteDisplayable();
 		});
-		
+
 		cancel.addClickShortcut(Key.ESCAPE);
 		btnSave.addClickShortcut(Key.F2);
 		btnDelete.addClickShortcut(Key.KEY_S, KeyModifier.ALT);
-		
+
 		cancel.addClickListener(e -> {
 			grid.asSingleSelect().clear();
 			cancel.clickInClient();
 //        	splitLayout.setSplitterPosition(100);
 			splitLayout.getSecondaryComponent().setVisible(false);
 			grid.focus();
-			
+
 		});
 
 		btnSave.addClickListener(e -> {
 			saveDisplayable();
+			refreshGrid();
 
 		});
 		headerLayout.add(labelLayout, buttonLayout);
@@ -554,9 +672,9 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 	}
 
 	private void deleteDisplayable() {
-		if(currentDisplayable != null) {
+		if (currentDisplayable != null) {
 			displayableService.delete(currentDisplayable);
-			
+
 			displayables.remove(currentDisplayable);
 			grid.setItems(displayables);
 			cancel.clickInClient();
@@ -577,7 +695,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 					Entry<FieldDetail, PropertyDescriptor> entry = it.next();
 					FieldDetail fd = entry.getKey();
 					PropertyDescriptor pd = entry.getValue();
-					if( fd != null && componentsByField.get(fd) != null)
+					if (fd != null && componentsByField.get(fd) != null)
 						pd.getWriteMethod().invoke(currentDisplayable, componentsByField.get(fd).getValue());
 				}
 
@@ -589,41 +707,50 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		}
 		try {
 
-			application.getAction().stream().filter(a ->{				
+			application.getAction().stream().filter(a -> {
 				return a.getActionType().equals(ActionType.SUBMIT) & a.isBefore();
-			}).forEach(a ->{
-				Iterator<Entry<FieldDetail, Object>> updates = a.getUpdates().entrySet().iterator();
-				
-				while(updates.hasNext()) {
-					Entry<FieldDetail, Object> entry = updates.next();
-					FieldDetail field = entry.getKey();
-					Object updatedValue = field.getDefaultValue();
-					
-//					Class<?> clazz = componentsByField.get(field).getType(); 
-					
-					SuperComponentInterface<?, ?> component = componentsByField.get(field);
-					if(component instanceof AbstractSimpleSuperComponent) {
-						((AbstractSimpleSuperComponent<Object>)componentsByField.get(field)).setValue((updatedValue));
-					}else if(component instanceof AbstractSuperCustomField) {
-						((AbstractSuperCustomField)componentsByField.get(field)).setValue((String) (updatedValue));
-					}else if(component instanceof AbstractSuperDisplayableComponent) {
-						((AbstractSuperDisplayableComponent)componentsByField.get(field)).setValue((updatedValue));
+			}).forEach(a -> {
+				if (a.getUpdates() != null) {
 
+					Iterator<Entry<FieldDetail, Object>> updates = a.getUpdates().entrySet().iterator();
+
+					while (updates.hasNext()) {
+						Entry<FieldDetail, Object> entry = updates.next();
+						FieldDetail field = entry.getKey();
+						Object updatedValue = field.getDefaultValue();
+
+						if(updatedValue instanceof FunctionalInterfaceLocalDateTime) {
+							updatedValue = ((FunctionalInterfaceLocalDateTime) updatedValue).now();
+						}
+						
+						SuperComponentInterface<?, ?> component = componentsByField.get(field);
+						if (component instanceof AbstractSimpleSuperComponent) {
+							((AbstractSimpleSuperComponent<Object>) componentsByField.get(field))
+									.setValue((updatedValue));
+						} else if (component instanceof AbstractSuperCustomField) {
+							((AbstractSuperCustomField) componentsByField.get(field)).setValue((String) (updatedValue));
+						} else if (component instanceof AbstractSuperDisplayableComponent) {
+							((AbstractSuperDisplayableComponent) componentsByField.get(field)).setValue((updatedValue));
+
+						}
 					}
 				}
-				
+
 			});
-			
+
 			binder.writeBean(currentDisplayable);
 
-			displayableService.update(currentDisplayable);
-			
-			
-			application.getAction().stream().filter(a ->{				
-				return a.getActionType().equals(ActionType.SUBMIT) & !a.isBefore();
-			}).forEach(a -> a.getServiceAction().accept(serviceProxy.getInstance(Translation.class)));;
+			if(this.appCtx.equals(EAPP_CONTEXT.ADD)) {
+				displayableService.create(currentDisplayable);
+			}else {
+				displayableService.update(currentDisplayable);				
+			}
 
-			
+			application.getAction().stream().filter(a -> {
+				return a.getActionType().equals(ActionType.SUBMIT) & !a.isBefore();
+			}).forEach(a -> a.getServiceAction().accept(serviceProxy.getInstance(Translation.class)));
+			;
+
 			populateForm(currentDisplayable);
 			if (!isNew) {
 				grid.getDataProvider().refreshItem(currentDisplayable);
@@ -656,31 +783,33 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 //		Location location = event.getLocation();
 //		QueryParameters queryParameters = location.getQueryParameters();
 
-		displayableService = serviceProxy.getInstance(modelClazz);
-		displayables = displayableService.getWithSorting(null);
+		refreshGrid();
 
-		this.grid.setItems(displayables);
-		
-		
-		findEntityFieldsComponents().stream().forEach(s ->{
-			s.initialize(serviceProxy);
+		findEntityFieldsComponents().stream().forEach(s -> {
+			s.initializeList(serviceProxy);
 		});
 
-		if(application.getAppLabelKey() == null) {
+		if (application.getAppLabelKey() == null) {
 			pageTitle = "UNDEFINED";
-		}else {
+		} else {
 			pageTitle = application.getAppLabelKey();
 		}
 //			pagetit
 	}
 
-	private List<SuperComponentInterface<?,? extends Component>> findEntityFieldsComponents() {
-		return componentsByField.entrySet().stream().filter(e -> e.getKey().getEntityDescriptor() != null)
-				.map(m -> m.getValue())
-		        .collect(Collectors.toList());
+	private void refreshGrid() {
+		displayableService = serviceProxy.getInstance(modelClazz);
+		displayables = displayableService
+				.getWithSorting(application.getTlManager().getDefaultResultView().getSortField());
+
+		this.grid.setItems(displayables);
 	}
-	
-	
+
+	private List<SuperComponentInterface<?, ? extends Component>> findEntityFieldsComponents() {
+		return componentsByField.entrySet().stream().filter(e -> e.getKey().getEntityDescriptor() != null || e.getKey() instanceof FieldDetailList)
+				.map(m -> m.getValue()).collect(Collectors.toList());
+	}
+
 	@Override
 	public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
 		if (parameter != null) {

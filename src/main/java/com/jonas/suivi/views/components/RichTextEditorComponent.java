@@ -3,15 +3,14 @@ package com.jonas.suivi.views.components;
 import com.jonas.suivi.views.components.container.PushyView;
 import com.jonas.suivi.views.model.FieldDetail;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.shared.Registration;
-//import com.wontlost.ckeditor.VaadinCKEditor;
+import com.wontlost.ckeditor.VaadinCKEditor;
 
 public class RichTextEditorComponent extends AbstractSimpleSuperComponent<String>
 {
 	
 //	TextField data;
-	TextArea ckEditor; 
+	VaadinCKEditor ckEditor; 
 	PushyView p ;
 	
 	public RichTextEditorComponent(FieldDetail field) {
@@ -22,7 +21,7 @@ public class RichTextEditorComponent extends AbstractSimpleSuperComponent<String
 //		ckEditor = RichTextEditorBuilder.richTextEditor("");
 //		p.add(ckEditor);
 //		this.add(p);
-	
+//	
 //		ckEditor.addValueChangeListener(v ->{
 //			data.setValue(ckEditor.getValue());
 //		});
@@ -98,6 +97,12 @@ public class RichTextEditorComponent extends AbstractSimpleSuperComponent<String
 	@Override
 	public void setValue(String value) {
 		 PushyView.setValue(value);
+		
+	}
+
+	@Override
+	public void initialize() {
+//		p.setValue(getValue());
 		
 	}
 

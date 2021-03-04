@@ -47,6 +47,11 @@ public class UserAccount implements Displayable{
 		// TODO Auto-generated method stub
 		return id;
 	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	
 	
 	
 	

@@ -3,6 +3,7 @@ package com.jonas.suivi.views.model;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.jonas.suivi.backend.services.DisplayableService;
 
@@ -13,6 +14,9 @@ public class Action {
 	ActionType actionType;
 	
 	Map<FieldDetail, Object> updates;
+	Map<FieldDetail, Class<?>> contextUpdates;
+
+	Map<FieldDetail, Supplier<?>> consumerUpdate;
 	
 	
 	boolean before = true;
@@ -43,6 +47,26 @@ public class Action {
 		
 	}
 
+	
+	
+	
+	public void addContextUpdate(FieldDetail field, Class<?> value) {
+		if(contextUpdates == null) {
+			contextUpdates = new HashMap<FieldDetail, Class<?>>();
+		}
+		
+		contextUpdates .put(field, value);
+		
+	}
+	
+	
+	public <T> void addConsumerUpdate(FieldDetail field, Supplier<T> value, Consumer<T> consumer) {
+		
+		consumerUpdate .put(field, value);
+		
+	}
+	
+	
 	
 	public boolean isBefore() {
 		return before;

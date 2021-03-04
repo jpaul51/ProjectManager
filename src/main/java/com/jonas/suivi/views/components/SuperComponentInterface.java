@@ -14,9 +14,7 @@ public interface SuperComponentInterface<U extends Object, T extends Component >
 		
 	public U getValue();
 	
-//	public <W>void setValue(W value);
-	
-//	public Class<U> getType();
+
 		
 	public FieldDetail getFieldDetail();
 	public void setFieldDetail(FieldDetail field);
@@ -26,11 +24,14 @@ public interface SuperComponentInterface<U extends Object, T extends Component >
 		
 	}
 	
+	
+	public void initialize();
+	
 	/**
 	 * Loads field using external Table
 	 * @param serviceProxy
 	 */
-	default public void initialize(ServiceProxy serviceProxy) {
+	default public void initializeList(ServiceProxy serviceProxy) {
 //		((KeyNotifier) getComponent()).addKeyPressListener(l ->{
 //			if(l.getKey().equals(Key.ESCAPE)){
 //				

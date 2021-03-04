@@ -8,9 +8,11 @@ public class LabelComponent extends AbstractSimpleSuperComponent<String> {
 
 	
 	TextField component;
+	String defaultValue;
 	
 	public  LabelComponent(FieldDetail field, String text) {
 		component = new TextField(text);
+		defaultValue = text;
 		component.setReadOnly(true);
 	}
 
@@ -61,6 +63,12 @@ public class LabelComponent extends AbstractSimpleSuperComponent<String> {
 	public Registration addValueChangeListener(ValueChangeListener listener) {
 		// TODO Auto-generated method stub
 		return component.addValueChangeListener(listener);
+	}
+
+	@Override
+	public void initialize() {
+		component.setValue(defaultValue);
+		
 	}
 	
 	

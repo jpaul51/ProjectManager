@@ -30,8 +30,10 @@ public class CheckComponent extends AbstractSimpleSuperComponent<Boolean>{
 
 	@Override
 	public Registration addValueChangeListener(ValueChangeListener<? super ValueChangeEvent<Boolean>> listener) {
-		// TODO Auto-generated method stub
+		
+		
 		return checkBox.addValueChangeListener(listener);
+		
 	}
 
 	@Override
@@ -45,11 +47,23 @@ public class CheckComponent extends AbstractSimpleSuperComponent<Boolean>{
 		
 	}
 
+
+
 	@Override
 	public void setValue(Boolean value) {
-		checkBox.setValue(value);
-		
+		if(value == null) {
+		value = false;
 	}
+	checkBox.setValue(value);		
+	}
+
+
+	@Override
+	public void initialize() {
+		setValue(false);
+	}
+
+
 	
 
 }

@@ -28,7 +28,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .requestCache().requestCache(new CustomRequestCache()) 
             .and().authorizeRequests() 
             .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()  
-
             .anyRequest().authenticated()  
 
             .and().formLogin()  
@@ -37,6 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .failureUrl(LOGIN_FAILURE_URL)
             .and().logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
             	.invalidateHttpSession(true).deleteCookies("JSESSIONID");
+         
     }
     
  

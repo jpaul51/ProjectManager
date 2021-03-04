@@ -1,5 +1,6 @@
 package com.jonas.suivi.views.components.container;
 
+import com.jonas.suivi.views.components.RichTextEditorBuilder;
 import com.jonas.suivi.views.model.FieldDetail;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
@@ -8,13 +9,14 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
+import com.wontlost.ckeditor.VaadinCKEditor;
 //import com.wontlost.ckeditor.VaadinCKEditor;
 
 
 public class PushyView extends VerticalLayout {
 
 	FieldDetail field;
-	public static TextArea c;
+	public static VaadinCKEditor c;
 	private static String value = "";
 	private UI ui;
 
@@ -72,8 +74,8 @@ public class PushyView extends VerticalLayout {
 		public void run() {
 			// Update the data for a while
 			if (c == null) {
-//				c = RichTextEditorBuilder.richTextEditor(value);
-				c = new TextArea(value);
+				c = RichTextEditorBuilder.richTextEditor(value);
+//				c = new TextArea(value);
 			}
 
 			c.getElement().getStyle().clear();

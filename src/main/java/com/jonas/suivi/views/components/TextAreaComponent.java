@@ -57,4 +57,10 @@ public class TextAreaComponent extends AbstractSimpleSuperComponent<String> {
 		component.setReadOnly(requiredIndicatorVisible);
 	}
 
+	@Override
+	public void initialize() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

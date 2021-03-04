@@ -10,7 +10,7 @@ public class PersonDescriptor extends Application {
 
 	
 	public PersonDescriptor() {
-		
+		super();
 		this.setAppLabelKey(EAppTranslation.APP_LABEL_PERSON.name());
 		this.setAppName("persons");
 

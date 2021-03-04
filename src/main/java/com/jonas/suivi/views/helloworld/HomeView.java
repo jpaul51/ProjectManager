@@ -42,6 +42,5 @@ public class HomeView extends Div  implements AfterNavigationObserver{
 
 		
 		
-		
 	}
 }

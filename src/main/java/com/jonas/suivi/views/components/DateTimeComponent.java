@@ -3,6 +3,7 @@ package com.jonas.suivi.views.components;
 import java.time.LocalDateTime;
 
 import com.jonas.suivi.backend.util.TranslationUtils;
+import com.jonas.suivi.views.descriptors.FunctionalInterfaceLocalDateTime;
 import com.jonas.suivi.views.descriptors.InvalidFieldDescriptorException;
 import com.jonas.suivi.views.model.FieldDetail;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
@@ -13,22 +14,28 @@ public class DateTimeComponent extends AbstractSimpleSuperComponent<LocalDateTim
 	
 	DateTimePicker component;
 	LocalDateTime defaultValue;
+	FunctionalInterface provider;
+	FieldDetail field;
 	
 	public DateTimeComponent(FieldDetail field) throws InvalidFieldDescriptorException {
+		this.field = field;
 		component = new DateTimePicker();
 		component.setLabel(TranslationUtils.translate(field.getTranslationKey()));
 		component.setLocale(TranslationUtils.locale);
 		component.setAutoOpen(false);
 		
 		if(field.getDefaultValue() != null) {
-			if(!(field.getDefaultValue() instanceof LocalDateTime)) {
-				throw new InvalidFieldDescriptorException("Date field value only accepts LocalDateTime");
+			if(!(field.getDefaultValue() instanceof LocalDateTime) && 
+					!(field.getDefaultValue() instanceof FunctionalInterfaceLocalDateTime)) {
+				throw new InvalidFieldDescriptorException("Date field value only accepts LocalDateTime or providers");
 			}
-			defaultValue = (LocalDateTime) field.getDefaultValue();
-			component.setValue(defaultValue);
+			
+			initialize();
 		}
 		
 	}
+
+
 	
 	
 	@Override
@@ -86,6 +93,33 @@ public class DateTimeComponent extends AbstractSimpleSuperComponent<LocalDateTim
 		}
 		component.setValue(value);
 	}
+
+
+
+
+
+
+
+
+
+	@Override
+	public void initialize() {
+		if(field.getDefaultValue() instanceof LocalDateTime){ 
+			defaultValue = (LocalDateTime) field.getDefaultValue();
+		}else {
+			defaultValue = ((FunctionalInterfaceLocalDateTime) field.getDefaultValue()).now();
+		}
+		
+		
+		component.setValue(defaultValue);
+		
+	}
+
+
+
+
+
+	
 
 
 

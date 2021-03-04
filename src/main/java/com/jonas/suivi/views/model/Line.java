@@ -7,8 +7,16 @@ import java.util.List;
 public class Line {
 
 	List<FieldDetail> fields = new ArrayList<>();
+	boolean isHidden;
 	
-	
+	public boolean isHidden() {
+		return isHidden;
+	}
+
+	public void setHidden(boolean isHidden) {
+		this.isHidden = isHidden;
+	}
+
 	public Line (FieldDetail... fields) {
 		this.fields = Arrays.asList(fields);
 	}

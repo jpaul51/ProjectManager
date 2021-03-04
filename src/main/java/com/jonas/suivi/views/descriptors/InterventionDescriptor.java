@@ -10,7 +10,9 @@ import com.jonas.suivi.views.model.ActionType;
 import com.jonas.suivi.views.model.Application;
 import com.jonas.suivi.views.model.DetailLayoutManager;
 import com.jonas.suivi.views.model.FieldDetail;
+import com.jonas.suivi.views.model.FieldDetailList;
 import com.jonas.suivi.views.model.Input;
+import com.jonas.suivi.views.model.SortField;
 import com.jonas.suivi.views.model.TableLayoutManager;
 
 @MainEntity(Intervention.class)
@@ -18,7 +20,7 @@ public class InterventionDescriptor extends Application{
 
 	
 	public InterventionDescriptor() {
-		
+		super();
 		this.setAppLabelKey(TranslationUtils.translate(EAppTranslation.APP_LABEL_INTERVENTION.name()));
 		
 		FieldDetail descField = new FieldDetail();
@@ -37,22 +39,22 @@ public class InterventionDescriptor extends Application{
 		createdDate.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_CREATED_DATE.name());
 		createdDate.setName("createdDate");
 		createdDate.setReadOnly(true);
-		createdDate.setDefaultValue(LocalDateTime.now());
+		createdDate.setDefaultValue(LocalDateTime::now);
 
 		FieldDetail modifiedDate = new FieldDetail();
 		modifiedDate .setType(Input.DATE_TIME);
 		modifiedDate .setTranslationKey(EAppFieldsTranslation.APP_FIELDS_MODIFIED_DATE.name());
 		modifiedDate.setName("lastModifiedDate");
 		modifiedDate.setReadOnly(true);
-		modifiedDate.setDefaultValue(LocalDateTime.now());
+		FunctionalInterfaceLocalDateTime dd = LocalDateTime::now;
+		modifiedDate.setDefaultValue(dd);
 		
 		FieldDetail duration = new FieldDetail();
 		duration.setType(Input.DATE_TIME_ONLY);
 		duration.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_DURATION.name());
 		duration.setName("duration");
 		
-		FieldDetail projectField = new FieldDetail();
-		projectField.setType(Input.SELECT);
+		FieldDetailList projectField = new FieldDetailList();
 		projectField.setTranslationKey(EAppTranslation.APP_LABEL_PROJECT.name());
 		projectField.setName("project");
 		projectField.setEntityDescriptor(ProjectDescriptor.class);
@@ -61,13 +63,22 @@ public class InterventionDescriptor extends Application{
 		
 		Action onSubmit = new Action();
 		onSubmit.setActionType(ActionType.SUBMIT);
-		onSubmit.addFieldUpdate(modifiedDate, LocalDateTime.now());
+		FunctionalInterfaceLocalDateTime computedModifiedDate = LocalDateTime::now;
+		onSubmit.addFieldUpdate(modifiedDate, computedModifiedDate);
+//		onSubmit.addConsumerUpdate<LocalDateTi>(modifiedDate, t ->);
+//		this
 		
 		this.addAction(onSubmit);
 		
 		TableLayoutManager tbl = new TableLayoutManager();
-		tbl.getDefaultResultView().getQuickSearchList().addAll(Arrays.asList(descField, commentField, projectField));
+		tbl.getDefaultResultView().getQuickSearchList().addAll(Arrays.asList(descField, commentField));
+		SortField sort = new SortField();
+		sort.addSort(modifiedDate);
+		tbl.getDefaultResultView().setSortField(sort);
 		
+		
+		
+		this.setTlManager(tbl);
 		
 	}
 	

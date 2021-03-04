@@ -9,6 +9,7 @@ import com.jonas.suivi.views.model.Bloc;
 import com.jonas.suivi.views.model.Detail;
 import com.jonas.suivi.views.model.DetailLayoutManager;
 import com.jonas.suivi.views.model.FieldDetail;
+import com.jonas.suivi.views.model.FieldDetailList;
 import com.jonas.suivi.views.model.Input;
 import com.jonas.suivi.views.model.Line;
 
@@ -21,7 +22,7 @@ public class ProjectDescriptor extends Application{
 	
 	
 	public ProjectDescriptor() {
-		
+		super();
 		this.setAppLabelKey(EAppTranslation.APP_LABEL_PROJECT.name());
 		this.setAppName("projects");
 		
@@ -36,8 +37,7 @@ public class ProjectDescriptor extends Application{
 		description.setName("description");
 		description.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_DESCRIPTION.name());
 
-		FieldDetail projectManager = new FieldDetail();
-		projectManager.setType(Input.SELECT);
+		FieldDetailList projectManager = new FieldDetailList();
 		projectManager.setName("projectManager");
 		projectManager.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_MANAGER.name());
 		projectManager.setEntityDescriptor(PersonDescriptor.class);

@@ -1,6 +1,11 @@
 package com.jonas.suivi.views.model;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import com.jonas.suivi.backend.services.DisplayableService;
+import com.jonas.suivi.views.descriptors.FunctionalInterfaceLocalDateTime;
 
 
 public class FieldDetail {
@@ -11,7 +16,6 @@ public class FieldDetail {
 	
 	Class<? extends Application > entityDescriptor;
 
-	List<Class<?  extends Enum>> valueProviders;
 	
 //	Class<Enum<? extends Enum>> keyProvider;
 
@@ -72,6 +76,9 @@ public class FieldDetail {
 	public void setDefaultValue(Object defaultValue) {
 		this.defaultValue = defaultValue;
 	}
+	public void setDefaultValue(FunctionalInterfaceLocalDateTime defaultValue) {
+		this.defaultValue = defaultValue;
+	}
 
 	public String getName() {
 		return name;
@@ -99,14 +106,6 @@ public class FieldDetail {
 
 	
 
-	public List<Class<? extends Enum>> getValueProviders() {
-		return valueProviders;
-	}
-
-	public void setValueProviders(List<Class<? extends Enum>> valueProviders) {
-		this.valueProviders = valueProviders;
-	}
-
 	
 	
 	public boolean isValueHidden() {
@@ -117,6 +116,11 @@ public class FieldDetail {
 		this.isValueHidden = isValueHidden;
 	}
 
+	public void filterValues( Consumer<DisplayableService> consumer) {
+		
+	}
+	
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

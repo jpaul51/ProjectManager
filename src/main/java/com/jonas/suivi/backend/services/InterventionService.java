@@ -1,5 +1,6 @@
 package com.jonas.suivi.backend.services;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -43,16 +44,24 @@ public class InterventionService implements DisplayableService {
 	
 	@Override
 	public <T extends Displayable> List<T> getWithSorting(SortField sort) {
-//		sort.getSortingByField();
+
+		List<Sort> sortList = new ArrayList<>();
+		int i = 0;
 		sort.getSortingByField().forEach(m ->{
 			Iterator<Entry<FieldDetail,SortType>> entrySetIterator = m.entrySet().iterator();
 			while(entrySetIterator.hasNext()) {
 				Entry<FieldDetail,SortType> entry = entrySetIterator.next();
-//				entry.getKey().getName()gin
+				entry.getKey().getName();	
+				entry.getValue().name();
+				if(sortList.size() <= i ) {
+					sortList.add(Sort.by(entry.getKey().getName()));
+				}
+				sortList.set(i,sortList.get(i).descending());
+//				sortdb.by(entry.getKey().getName()).descending();
 			}
 		});
 		
-		return (List<T>) interRepo.findAll(Sort.by("id").descending());
+		return (List<T>) interRepo.findAll(sortList.get(i));
 	}
 
 	@Override

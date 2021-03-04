@@ -29,5 +29,12 @@ public class LogoutController {
 	    return "logout";
 	}
 	
+//	@RequestMapping(value = {"/login"}, method = RequestMethod.POST)
+//	public String login(HttpServletRequest request,HttpServletResponse response){
+//	
+//
+//	    return "nope";
+//	}
+//	
 	
 }

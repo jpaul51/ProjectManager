@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import com.jonas.suivi.views.descriptors.InvalidFieldDescriptorException;
 import com.jonas.suivi.views.descriptors.MainEntity;
 import com.jonas.suivi.views.model.Application;
 import com.jonas.suivi.views.model.FieldDetail;
+import com.jonas.suivi.views.model.FieldDetailList;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.shared.Registration;
 
@@ -26,15 +28,17 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 	Class<? extends Displayable> fieldMainEntity;
 
 	List<? extends Displayable> valueProvider;
-	//TODO: enum list to Displayable!
+
+	FieldDetailList field;
 	
 //	List<CharSequence> values = new ArrayList<>();
 	
 //	Enum selectedEnum;
 
-	public SelectComponent(FieldDetail field, Class<? extends Application> viewClazz)
+	public SelectComponent(FieldDetailList field, Class<? extends Application> viewClazz)
 			throws InvalidFieldDescriptorException {
 		super();
+		this.field = field;
 		Class<? extends Application> descriptor = field.getEntityDescriptor();
 
 		if (descriptor == null &&  field.getValueProviders() == null) {
@@ -42,6 +46,8 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 		}
 
 		if (field.getValueProviders() != null) {
+			
+			
 			
 			List<Displayable> displayables = new ArrayList<Displayable>();
 			for(Class<? extends Enum> clazz : field.getValueProviders()) {
@@ -54,9 +60,10 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 						}).collect(Collectors.toList()));
 					
 			}
+			this.valueProvider = displayables;
 			select.setItems((Collection<V>) displayables);
 			select.setItemLabelGenerator(i -> i.getLabel());
-			fieldMainEntity = SimpleDisplayable.class;
+//			fieldMainEntity = SimpleDisplayable.class;
 
 //			valueProviders = field.getValueProviders();
 //			select.setItemLabelGenerator(i -> i.getValues().stream()
@@ -66,12 +73,13 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 					
 		} else {
 
-			fieldMainEntity = descriptor.getAnnotation(MainEntity.class).value();
 			select.setItemLabelGenerator(i -> i.getLabel());
 
 			
 
 		}
+		fieldMainEntity = descriptor.getAnnotation(MainEntity.class).value();
+
 		
 		try {
 			Application appDescriptor = viewClazz.getConstructor().newInstance();
@@ -100,22 +108,40 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 	}
 
 	@Override
-	public void initialize(ServiceProxy serviceProxy) {
-		super.initialize(serviceProxy);
+	public void initializeList(ServiceProxy serviceProxy) {
+		super.initializeList(serviceProxy);
 
-		if (valueProvider != null) {
+		if(serviceProxy != null && fieldMainEntity != null && serviceProxy.getInstance(fieldMainEntity) != null) {
+			List<Displayable> savedItems = serviceProxy.getInstance(fieldMainEntity).getAll();
+	//		itemsserviceProxy.getInstance(fieldMainEntity).getAll());
+	
 			
 			
-			
-		} else {
-
-			select.setItems(serviceProxy.getInstance(fieldMainEntity).getAll());
-
-			select.addCustomValueSetListener(l -> {
-				System.out.println("gg");
-			});
+			if (valueProvider != null) {
+				if(field.isUnique()) {
+					Iterator<Displayable> itVlueProvider = (Iterator<Displayable>) valueProvider.iterator();
+					while(itVlueProvider.hasNext()) {
+						
+						Displayable v = itVlueProvider.next();
+						if(savedItems.stream().map(d -> d.getLabel()).collect(Collectors.toList()).contains(v.getLabel()))
+							itVlueProvider.remove();
+						
+					}
+					
+					
+				}
+				
+				
+			}else {
+				select.setItems((Collection<V>) savedItems);
+			}
+	
+	
+				select.addCustomValueSetListener(l -> {
+					System.out.println("gg");
+				});
+		
 		}
-
 //			SelectComponent.this.fireEvent<2>(new ComponentEvent(select.getParent().get(),
 //					Integer.parseInt(Long.toString(ComponentEvent.WINDOW_FOCUS_EVENT_MASK))));
 //		});
@@ -125,14 +151,6 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 	public void onClose() {
 		super.onClose();
 		select.blur();
-//		select.blur();
-//		select.setValue(select.getValue());
-//		select.removeAll();
-//		select.setReadOnly(true);
-//		select.getItemRenderer().updateComponent(select, null);
-//		select.getParent().
-//		select.focus();
-//		select.blur();
 	}
 
 	@Override
@@ -186,6 +204,12 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 	public boolean isRequiredIndicatorVisible() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void initialize() {
+		
+		
 	}
 
 }

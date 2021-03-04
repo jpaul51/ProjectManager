@@ -75,4 +75,11 @@ public class TimeComponent extends AbstractSimpleSuperComponent < LocalTime> {
 		return isRequired;
 	}
 
+
+	@Override
+	public void initialize() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

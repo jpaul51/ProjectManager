@@ -8,6 +8,7 @@ import com.jonas.suivi.views.model.ActionType;
 import com.jonas.suivi.views.model.Application;
 import com.jonas.suivi.views.model.DetailLayoutManager;
 import com.jonas.suivi.views.model.FieldDetail;
+import com.jonas.suivi.views.model.FieldDetailList;
 import com.jonas.suivi.views.model.Input;
 import com.jonas.suivi.views.model.TableLayoutManager;
 
@@ -17,17 +18,17 @@ import com.jonas.suivi.views.model.TableLayoutManager;
 public class TranslationDescriptor extends Application {
 
 	public TranslationDescriptor() {
-		
+		super();
 
 		this.setAppLabelKey(EAppTranslation.APP_LABEL_TRANSLATION.name());
 		this.setAppName("translations");
 		
 		
-		FieldDetail key = new FieldDetail();
-		key.setType(Input.SELECT);
-		key.setValueProviders(Arrays.asList(EAppTranslation.class, EAppFieldsTranslation.class));
+		FieldDetailList key = new FieldDetailList();
+		key.setValueProviders(EAppTranslation.class, EAppFieldsTranslation.class);		
 		key.setName("key");
 		key.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_KEY.name());
+		key.setEntityDescriptor(TranslationDescriptor.class);
 		
 		FieldDetail transLatedValueFrench = new FieldDetail();
 		transLatedValueFrench.setName("frenchValue");
