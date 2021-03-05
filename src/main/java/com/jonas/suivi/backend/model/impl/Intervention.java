@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -18,6 +19,8 @@ public class Intervention implements Serializable, Displayable {
 	@Id @GeneratedValue
 	Long id;
 	private String description;
+	
+	@Column(length = 3000)
 	private String commentaire;
 	
 	@ManyToOne

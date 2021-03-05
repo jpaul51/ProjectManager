@@ -17,6 +17,10 @@ public class UserContextFactory implements ApplicationContextAware{
 		return userContext;
 	}
 	
+	public static void clearCurrentUserContext() {
+		userContext = null;
+	}
+	
 	public void setApplicationContext(Class<? extends com.jonas.suivi.views.model.Application> clazz) {
 		if(userContext == null) {
 			userContext = new UserContext();

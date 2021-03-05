@@ -1,6 +1,7 @@
 package com.jonas.suivi.security;
 
 import java.util.Collections;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.jonas.suivi.backend.model.impl.UserAccount;
 import com.jonas.suivi.backend.services.UserAccountService;
+import com.vaadin.flow.server.VaadinSession;
 
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
@@ -38,6 +40,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
       
       if (usrAcc != null && usrAcc.getLogin().equals(username) && encoder.matches(password, usrAcc.getPassword())) {
+    	   final String pushId = UUID.randomUUID().toString();
+    	   VaadinSession.getCurrent().setCurrent(null);
+
             return new UsernamePasswordAuthenticationToken(username, password, Collections.emptyList());
        } else {
             throw new BadCredentialsException("Authentication failed");

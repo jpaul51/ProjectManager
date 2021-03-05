@@ -8,18 +8,18 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.wontlost.ckeditor.VaadinCKEditor;
-//import com.wontlost.ckeditor.VaadinCKEditor;
 
 
 public class PushyView extends VerticalLayout {
 
 	FieldDetail field;
-	public static VaadinCKEditor c;
-	private static String value = "";
+	public VaadinCKEditor c;
+	
+	private  String value = "";
 	private UI ui;
-
+	
+	FeederThread thread ;
 	public PushyView(FieldDetail field) {
 		this.field = field;
 	}
@@ -28,17 +28,16 @@ public class PushyView extends VerticalLayout {
 		if (ui != null) {
 			getUI().ifPresent(ui -> ui.access(() -> {
 
-				FeederThread thread = new FeederThread(ui, this);
+				thread = new FeederThread(ui, this);
 				thread.start();
 
 			}));
 		}
 
-//		if(thread != null && !thread.isInterrupted()) {
-//		}else {
-//	        thread = new FeederThread(ui, this);
-
-//		}
+		if(thread != null && !thread.isInterrupted()) {
+		}else {
+	        thread = new FeederThread(ui, this);
+		}
 
 	}
 
@@ -54,12 +53,14 @@ public class PushyView extends VerticalLayout {
 	@Override
 	protected void onDetach(DetachEvent detachEvent) {
 		// Cleanup
-//		thread.interrupt();
-//		thread = new FeederThread(detachEvent.getUI(), this);
-//        thread = null;
+		if(thread != null) {
+			thread.interrupt();
+			thread = new FeederThread(detachEvent.getUI(), this);
+	        thread = null;
+		}
 	}
 
-	private static class FeederThread extends Thread {
+	public  class FeederThread extends Thread {
 		private final UI ui;
 		private final PushyView view;
 
@@ -75,7 +76,6 @@ public class PushyView extends VerticalLayout {
 			// Update the data for a while
 			if (c == null) {
 				c = RichTextEditorBuilder.richTextEditor(value);
-//				c = new TextArea(value);
 			}
 
 			c.getElement().getStyle().clear();
@@ -93,8 +93,15 @@ public class PushyView extends VerticalLayout {
 		}
 	}
 
-	public static void setValue(String value) {
-		PushyView.value = value;
-//		PushyView.c.setValue(value);
+	public  void setValue(String value) {
+		this.value = value;
 	}
+
+	public String getValue() {
+		return value;
+	}
+	
+	
+	
+	
 }

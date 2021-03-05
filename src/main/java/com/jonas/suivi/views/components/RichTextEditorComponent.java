@@ -28,12 +28,6 @@ public class RichTextEditorComponent extends AbstractSimpleSuperComponent<String
 		
 	}
 	
-//	@Override
-//	public PushyView getComponent() {
-//		return p;
-//	}
-
-//getc
 
 	
 
@@ -73,7 +67,7 @@ public class RichTextEditorComponent extends AbstractSimpleSuperComponent<String
 	@Override
 	public String getValue() {
 		// TODO Auto-generated method stub
-		return PushyView.c.getValue();
+		return p.getValue();
 	}
 
 	@Override
@@ -96,7 +90,7 @@ public class RichTextEditorComponent extends AbstractSimpleSuperComponent<String
 
 	@Override
 	public void setValue(String value) {
-		 PushyView.setValue(value);
+		 p.setValue(value);
 		
 	}
 

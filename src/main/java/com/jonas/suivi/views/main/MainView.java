@@ -3,6 +3,10 @@ package com.jonas.suivi.views.main;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
+
 import com.jonas.suivi.UserContextFactory;
 import com.jonas.suivi.views.about.AboutView;
 import com.jonas.suivi.views.descriptors.InterventionDescriptor;
@@ -35,7 +39,7 @@ import com.vaadin.flow.router.HighlightCondition;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.Command;
-import com.vaadin.flow.server.PWA;
+import com.vaadin.flow.server.VaadinSession;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -46,6 +50,9 @@ public class MainView extends AppLayout {
 
     private final Tabs menu;
     private H1 viewTitle;
+    
+    @Autowired
+    private ApplicationContext application;
 
     public MainView() {
         setPrimarySection(Section.DRAWER);
@@ -76,14 +83,19 @@ public class MainView extends AppLayout {
         Button btnLogout = new Button();
         btnLogout.addClickListener(c ->{
 
+        	 
         	UI.getCurrent().accessSynchronously(new Command() {
-				
+        		
+        		
 				@Override
 				public void execute() {
+					
 					UI.getCurrent().getPage().setLocation("logout");
+					UI.getCurrent().close();
+					VaadinSession.getCurrent().setCurrent(null);
 				}
 			});
-        	UI.getCurrent().close();
+        
         
         });
         btnLogout.setText("Logout");
