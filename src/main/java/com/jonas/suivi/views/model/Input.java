@@ -29,7 +29,7 @@ public @interface Input {
 	public static String COORDINATE_CURRENT="COORDINATE_CURRENT";
 	public static String COORDINATE_GEOCODING="COORDINATE_GEOCODING";
 	public static String COORDINATE_MAP="COORDINATE_MAP";
-	public static String TEXT_INPUT_MULTIPLE = "TEXT_INPUT_MULTIPLE";
+	public static String ENTITY = "ENTITY";
 	
 	public static String SELECT = "SELECT";
 

@@ -89,6 +89,8 @@ import com.vaadin.flow.router.Route;
 @Route(value = "app", layout = MainView.class)
 public class SplitView extends AbstractView implements HasUrlParameter<String> {
 
+	private static final String CLASS_HEADER_LAYOUT = "header-layout";
+
 	@Autowired
 	UserContextFactory userContextFactory;
 
@@ -107,7 +109,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 
 	String pageTitle = "vide";
 
-	Div a = new Div();
 	Class<? extends Application> viewClazz;
 	Class<? extends Displayable> modelClazz;
 	Grid<Displayable> grid;
@@ -162,7 +163,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 				application = viewClazz.getConstructor().newInstance();
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -181,7 +181,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		UI.getCurrent().getPage().getHistory().pushState(null, "app");
 
 		binder = new Binder<>(clazz);
-//		binder.wr
 
 		grid = new Grid<>();
 		grid.addClassName("my-grid");
@@ -203,18 +202,16 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 
 		TableLayoutManager tlManager = application.getTlManager();
 
-//		if (tlManager == null && !application.isNoTable()) {
+		if (tlManager == null) {
 
-		tlManager = new TableLayoutManager();
+			tlManager = new TableLayoutManager();
+		}
 		ResultView resultView = tlManager.getDefaultResultView();
 
 		if (resultView.getColumns().isEmpty()) {
 			resultView.setColumns(application.getAllFields());
 		}
 
-//			tlManager.setColumns(application.getAllFields());
-
-//		}
 
 		for (FieldDetail column : resultView.getColumns()) {
 			if (column.getName() == null) {
@@ -236,8 +233,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 
 							.append("</div>");
 
-					Html content = new Html(stringcontent.toString());
-					return content;
+					return  new Html(stringcontent.toString());
 
 				}));
 			} else if (column.getType().equals(Input.DATE_TIME)) {
@@ -257,7 +253,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 						value = new StringBuilder();
 					}
 					Label l = new Label(value.toString());
-//					l.getStyle().clear().set("background-transparency", value)
 					l.getStyle().clear().set("pointer-events", "none");
 					
 					d.add(l);
@@ -312,7 +307,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		GridSingleSelectionModel<Displayable> m = (GridSingleSelectionModel<Displayable>) grid.getSelectionModel();
 		m.setDeselectAllowed(false);
 
-//		splitLayout.getSecondaryComponent().setVisible(true);
 		this.add(splitLayout);
 	}
 
@@ -332,13 +326,10 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		binder = new Binder(this.modelClazz);
 		componentsByField = new HashMap<>();
 		formComponents = new ArrayList<SuperComponentInterface<?,? extends Component>>();
-//		this.splitLayout.getSecondaryComponent().
 		formLayout = new FormLayout();
 		
 		createEditorLayout(splitLayout);
-//		createButtonLayout(editorDiv);
-		
-//		this.splitLayout.addToSecondary(formLayout);
+
 		for (Bloc b : currentDt.getBlocs()) {
 
 			for (Line l : b.getLines()) {
@@ -397,12 +388,10 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 	private VerticalLayout initToolbar() {
 		toolbar = new Div();
 		toolbar.setWidthFull();
-		toolbar.getElement().getClassList().add("header-layout");
+		toolbar.getElement().getClassList().add(CLASS_HEADER_LAYOUT);
 
 		HorizontalLayout hl = new HorizontalLayout();
 
-//		hl.setWidthFull();
-//		hl.setAlignItems(Alignment.END);
 		Button btnAdd = new Button(new Icon(VaadinIcon.PLUS));
 		btnAdd.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		hl.add(btnAdd);
@@ -424,30 +413,22 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 			splitLayout.getSecondaryComponent().setVisible(true);
 			loadLazyComponents();
 		});
-//		SearchBox ss = new SearchBox(null, null);
-//		ss.ic
 		
 		TextField sbox = new TextField();
 		sbox.setSuffixComponent(new Icon(VaadinIcon.SEARCH));
-//		sbox.setSearchMode(SearchMode.EXPLICIT);
 		sbox.addKeyPressListener(Key.ENTER, sf -> {
 			String searchedValue = sbox.getValue();
 			filteredDisplayables.clear();
 			filteredDisplayables.addAll(displayables.stream().filter(d ->{
-//				boolean isQuaified = false;
 				return application.getTlManager().getDefaultResultView().getQuickSearchList().stream().anyMatch(f ->{
 					try {
 						Object displayableValue = propDescriptorByField.get(f).getReadMethod().invoke(d);
 						
-						if(((String)displayableValue).toLowerCase().contains(searchedValue.toLowerCase().strip())) {
+						return (((String)displayableValue).toLowerCase().contains(searchedValue.toLowerCase().strip())); 
 							
-							return true;
-						}else {
-							return false;
-						}
+						
 						
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 						return false;
 					}
@@ -473,9 +454,9 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 	}
 
 	private void reloadEntityComponents() {
-		findEntityFieldsComponents().stream().forEach(s -> {
-			s.initializeList(serviceProxy);
-		});
+		findEntityFieldsComponents().stream().forEach(s -> 
+			s.initializeList(serviceProxy)
+		);
 	}
 
 	private void populateForm(Displayable object) {
@@ -483,7 +464,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 			labelId.setText(TranslationUtils.translate(EAppFieldsTranslation.APP_FIELDS_ADD.name()).concat(" ").concat(TranslationUtils.translate(pageTitle)));
 			currentDisplayable = null;
 			for (SuperComponentInterface<?, ? extends Component> disp : formComponents) {
-				disp.initialize();;
+				disp.initialize();
 			}
 		} else {
 
@@ -542,9 +523,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 
 		switch (fieldType) {
 
-//		case Input.TEXT_INPUT_MULTIPLE:
-//			
-//			break;		
 		case Input.TEXT_RICH:
 			component = new RichTextEditorComponent(field);
 			component.getComponent().getElement().setAttribute("colspan", "2");
@@ -610,7 +588,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		formDiv.add(formLayout);
 		panelDiv.add(formDiv);
 		formDiv.getStyle().set("overflow-y", "auto");
-//	        formDiv.getStyle().set("background-color", "#294365 !important");
 
 		formDiv.getClassNames().add("scrollable-div");
 		panelDiv.getStyle().set("overflow", "hidden");
@@ -624,13 +601,12 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		HorizontalLayout headerLayout = new HorizontalLayout();
 
 		HorizontalLayout labelLayout = new HorizontalLayout();
-//	        labelId.setVisible(false);
 		labelLayout.add(labelId);
 
 		labelLayout.getClassNames().add("editorHeader");
 
-		headerLayout.getClassNames().add("header-layout");
-		headerLayout.setId("header-layout");
+		headerLayout.getClassNames().add(CLASS_HEADER_LAYOUT);
+		headerLayout.setId(CLASS_HEADER_LAYOUT);
 		headerLayout.setWidthFull();
 		headerLayout.setSpacing(true);
 
@@ -641,12 +617,11 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		HorizontalLayout buttonLayout = new HorizontalLayout();
 		buttonLayout.add(btnDelete, cancel, btnSave);
 		buttonLayout.getClassNames().add("button-layout");
-//		labelLayout.setAlignItems(Alignment.START);
 		labelLayout.getClassNames().add("label-layout");
 
-		btnDelete.addClickListener(c -> {
-			deleteDisplayable();
-		});
+		btnDelete.addClickListener(c -> 
+			deleteDisplayable()
+		);
 
 		cancel.addClickShortcut(Key.ESCAPE);
 		btnSave.addClickShortcut(Key.F2);
@@ -655,7 +630,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 		cancel.addClickListener(e -> {
 			grid.asSingleSelect().clear();
 			cancel.clickInClient();
-//        	splitLayout.setSplitterPosition(100);
 			splitLayout.getSecondaryComponent().setVisible(false);
 			grid.focus();
 
@@ -667,7 +641,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 
 		});
 		headerLayout.add(labelLayout, buttonLayout);
-//	        headerLayout.add(buttonLayout);
 		editorDiv.add(headerLayout);
 	}
 
@@ -701,15 +674,14 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
 		try {
 
-			application.getAction().stream().filter(a -> {
-				return a.getActionType().equals(ActionType.SUBMIT) & a.isBefore();
-			}).forEach(a -> {
+			application.getAction().stream().filter(a -> 
+				 a.getActionType().equals(ActionType.SUBMIT) & a.isBefore()
+			).forEach(a -> {
 				if (a.getUpdates() != null) {
 
 					Iterator<Entry<FieldDetail, Object>> updates = a.getUpdates().entrySet().iterator();
@@ -760,7 +732,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String> {
 			}
 
 		} catch (ValidationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}

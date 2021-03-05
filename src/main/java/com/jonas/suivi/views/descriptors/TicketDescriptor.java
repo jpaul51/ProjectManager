@@ -40,10 +40,10 @@ public class TicketDescriptor extends Application {
 	projectField.setEntityDescriptor(ProjectDescriptor.class);
 	
 
-	FieldDetailList projectManager = new FieldDetailList();
-	projectManager.setName("reporter");
-	projectManager.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_REPORTER.name());
-	projectManager.setEntityDescriptor(PersonDescriptor.class);
+	FieldDetailList ticketReporter = new FieldDetailList();
+	ticketReporter.setName("reporter");
+	ticketReporter.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_REPORTER.name());
+	ticketReporter.setEntityDescriptor(PersonDescriptor.class);
 	
 	
 	FieldDetail createdDate = new FieldDetail();
@@ -77,7 +77,7 @@ public class TicketDescriptor extends Application {
 	
 	
 	
-	this.setDlManager(DetailLayoutManager.createSimpleDetail(titleField, descField, projectManager, projectField, ticketPriority, createdDate));
+	this.setDlManager(DetailLayoutManager.createSimpleDetail(titleField, descField, ticketReporter, projectField, ticketPriority, createdDate));
 	
 
 	
@@ -86,6 +86,7 @@ public class TicketDescriptor extends Application {
 	SortField sort = new SortField();
 	sort.addSort(ticketPriority);
 	tbl.getDefaultResultView().setSortField(sort);
+	tbl.getDefaultResultView().getColumns().addAll(Arrays.asList(titleField, ticketPriority,projectField, ticketStatus, ticketReporter ));
 	
 	
 	

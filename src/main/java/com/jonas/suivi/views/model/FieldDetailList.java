@@ -10,8 +10,16 @@ public class FieldDetailList extends FieldDetail {
 	
 
 	public FieldDetailList() {
+		this(false);
+	}
+	
+	public FieldDetailList(boolean gridType) {
 		super();
-		this.setType(Input.SELECT);
+		if(gridType) {
+			this.setType(Input.ENTITY);
+		}else {
+			this.setType(Input.SELECT);
+		}
 	}
 
 
