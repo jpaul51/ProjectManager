@@ -1,10 +1,11 @@
 package com.jonas.suivi.views.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class Application {
+public class Application  implements Serializable{
 
 	String appName;
 	String appLabelKey;

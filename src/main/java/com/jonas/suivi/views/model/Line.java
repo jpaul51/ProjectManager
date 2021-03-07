@@ -1,10 +1,11 @@
 package com.jonas.suivi.views.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Line {
+public class Line  implements Serializable{
 
 	List<FieldDetail> fields = new ArrayList<>();
 	boolean isHidden;

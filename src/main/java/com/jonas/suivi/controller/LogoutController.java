@@ -22,9 +22,9 @@ public class LogoutController {
 	        if(session != null) {
 	            session.invalidate();
 	        }
-	        for(javax.servlet.http.Cookie cookie : request.getCookies()) {
-	            cookie.setMaxAge(0);
-	        }
+//	        for(javax.servlet.http.Cookie cookie : request.getCookies()) {
+//	            cookie.setMaxAge(0);
+//	        }
 
 	    return "logout";
 	}

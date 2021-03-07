@@ -18,7 +18,7 @@ import com.vaadin.flow.router.RouteAlias;
 @Route(value = "", layout = MainView.class)
 @PageTitle("Hello World")
 @CssImport("./styles/views/helloworld/hello-world-view.css")
-@RouteAlias("home")
+@RouteAlias("/home")
 public class HomeView extends Div  implements AfterNavigationObserver{
 
    

@@ -1,5 +1,6 @@
 package com.jonas.suivi.views.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -8,7 +9,7 @@ import com.jonas.suivi.backend.services.DisplayableService;
 import com.jonas.suivi.views.descriptors.FunctionalInterfaceLocalDateTime;
 
 
-public class FieldDetail {
+public class FieldDetail  implements Serializable {
 
 	String type = Input.TEXT_INPUT;
 	String name;

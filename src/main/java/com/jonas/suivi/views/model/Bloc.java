@@ -1,9 +1,10 @@
 package com.jonas.suivi.views.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Bloc {
+public class Bloc  implements Serializable {
 	
 	
 	List<Line> lines = new ArrayList<>();

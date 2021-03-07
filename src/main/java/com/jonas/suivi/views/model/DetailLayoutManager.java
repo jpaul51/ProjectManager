@@ -1,9 +1,10 @@
 package com.jonas.suivi.views.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DetailLayoutManager {
+public class DetailLayoutManager  implements Serializable {
 	
 	
 	Detail defaultDetail;

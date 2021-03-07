@@ -1,9 +1,10 @@
 package com.jonas.suivi.views.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Detail {
+public class Detail  implements Serializable {
 
 	public enum DetailType{
 		NEW,

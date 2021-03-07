@@ -95,10 +95,12 @@ public class PushyView extends VerticalLayout {
 
 	public  void setValue(String value) {
 		this.value = value;
+		if(c != null)
+			c.setValue(value);
 	}
 
 	public String getValue() {
-		return value;
+		return c.getValue();
 	}
 	
 	

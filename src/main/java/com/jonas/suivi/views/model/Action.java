@@ -1,5 +1,6 @@
 package com.jonas.suivi.views.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -7,7 +8,7 @@ import java.util.function.Supplier;
 
 import com.jonas.suivi.backend.services.DisplayableService;
 
-public class Action {
+public class Action implements Serializable {
 
 	ActionOnSubmit actionOnSubmit;
 	
