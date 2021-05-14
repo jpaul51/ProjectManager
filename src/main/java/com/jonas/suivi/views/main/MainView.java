@@ -40,6 +40,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.Command;
 import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.lumo.Lumo;
 
 /**
  * The main view is a top-level placeholder for other views.

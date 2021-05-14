@@ -23,7 +23,8 @@ public class InterventionDescriptor extends Application{
 	public InterventionDescriptor() {
 		super();
 		this.setAppLabelKey(TranslationUtils.translate(EAppTranslation.APP_LABEL_INTERVENTION.name()));
-		
+		this.appPathLoc = InterventionDescriptor.appPath;
+		this.mainEntity = InterventionDescriptor.class.getAnnotation(MainEntity.class).value().getSimpleName();
 		FieldDetail descField = new FieldDetail();
 		descField.setType(Input.TEXT_AREA);
 		descField.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_DESCRIPTION.name());

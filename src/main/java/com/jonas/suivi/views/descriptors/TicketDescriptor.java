@@ -19,10 +19,13 @@ import com.jonas.suivi.views.model.TableLayoutManager;
 @MainEntity(Ticket.class)
 public class TicketDescriptor extends Application {
 	
+	public final static String appPath = "/tickets";
+	
 	public TicketDescriptor() {
 	super();
 	this.setAppLabelKey(TranslationUtils.translate(EAppTranslation.APP_LABEL_TICKET.name()));
-
+	this.mainEntity = TicketDescriptor.class.getAnnotation(MainEntity.class).value().getSimpleName();
+	this.appPathLoc = appPath;
 	
 	FieldDetail titleField = new FieldDetail();
 	titleField.setType(Input.TEXT_INPUT);

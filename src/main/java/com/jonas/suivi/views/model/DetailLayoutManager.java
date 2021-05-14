@@ -11,6 +11,12 @@ public class DetailLayoutManager  implements Serializable {
 	
 	Set<Detail> details = new HashSet<Detail>();
 
+	
+	public DetailLayoutManager() {
+		defaultDetail = new Detail();
+		details = new HashSet<>();
+	}
+	
 	public Detail getDefaultDetail() {
 		return defaultDetail;
 	}

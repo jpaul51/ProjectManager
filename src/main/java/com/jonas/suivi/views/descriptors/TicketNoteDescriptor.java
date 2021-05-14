@@ -23,7 +23,7 @@ public class TicketNoteDescriptor extends Application{
 		super();
 		
 		this.setAppLabelKey(TranslationUtils.translate(EAppTranslation.APP_LABEL_NOTE.name()));
-		
+		this.mainEntity = TicketNoteDescriptor.class.getAnnotation(MainEntity.class).value().getSimpleName();
 
 		FieldDetail dataField = new FieldDetail();
 		dataField.setType(Input.TEXT_RICH);

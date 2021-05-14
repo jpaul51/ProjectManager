@@ -27,24 +27,22 @@ public interface DisplayableService {
 	public <T extends Displayable> Optional<T> getByIdentifier(String d);
 
 	public default <T extends Displayable> List<T> getWithSorting(SortField sort) {
-//		sort.getSortingByField();			
 		return (List<T>) getRepo().findAll(Sort.by("id").descending());
 
 	}
-	
+
 	public default <T extends Displayable> Page<T> getWithSorting(SortField sort, int page, int size) {
-		return  (Page<T>) getRepo().findAll(PageRequest.of(page, size, Sort.by("id").descending()));
+		return (Page<T>) getRepo().findAll(PageRequest.of(page, size, Sort.by("id").descending()));
 
 	}
 
-	public default <T extends Displayable> List<T> getWithExampleAndSorting( Example example, SortField sort ){
-//		sort.getSortingByField();			
+	public default <T extends Displayable> List<T> getWithExampleAndSorting(Example example, SortField sort) {
 		return (List<T>) getRepo().findAll(example, Sort.by("id").descending());
 
 	}
-	
-	public default <T extends Displayable> Page<T> getWithExampleAndSorting( Example example, SortField sort, int page, int size ){
-//		sort.getSortingByField();			
+
+	public default <T extends Displayable> Page<T> getWithExampleAndSorting(Example example, SortField sort, int page,
+			int size) {
 		return (Page<T>) getRepo().findAll(example, PageRequest.of(page, size, Sort.by("id").descending()));
 
 	}

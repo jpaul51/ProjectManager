@@ -8,12 +8,16 @@ import com.jonas.suivi.views.model.FieldDetail;
 @MainEntity(Person.class)
 public class PersonDescriptor extends Application {
 
+		public static final String appPath = "/persons";
 	
 	public PersonDescriptor() {
 		super();
 		this.setAppLabelKey(EAppTranslation.APP_LABEL_PERSON.name());
 		this.setAppName("persons");
-
+		this.mainEntity = PersonDescriptor.class.getAnnotation(MainEntity.class).value().getSimpleName();
+		this.appPathLoc = appPath;
+		
+		
 		FieldDetail loginField = new FieldDetail();
 		loginField.setName("login");
 		loginField.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_LOGIN.name());

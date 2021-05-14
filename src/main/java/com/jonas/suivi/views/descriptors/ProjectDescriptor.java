@@ -19,12 +19,14 @@ import com.jonas.suivi.views.model.Line;
 @MainEntity(Project.class)
 public class ProjectDescriptor extends Application{
 
-	
+	public static final String appPath = "/projects";
 	
 	public ProjectDescriptor() {
 		super();
 		this.setAppLabelKey(EAppTranslation.APP_LABEL_PROJECT.name());
 		this.setAppName("projects");
+		this.mainEntity = ProjectDescriptor.class.getAnnotation(MainEntity.class).value().getSimpleName();
+		this.appPathLoc = appPath;
 		
 		
 		FieldDetail labelField = new FieldDetail();

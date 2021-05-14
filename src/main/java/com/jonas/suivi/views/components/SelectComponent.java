@@ -30,10 +30,7 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 	List<? extends Displayable> valueProvider;
 
 	FieldDetailList field;
-	
-//	List<CharSequence> values = new ArrayList<>();
-	
-//	Enum selectedEnum;
+
 
 	public SelectComponent(FieldDetailList field, Class<? extends Application> viewClazz)
 			throws InvalidFieldDescriptorException {
@@ -41,46 +38,35 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 		this.field = field;
 		Class<? extends Application> descriptor = field.getEntityDescriptor();
 
-		if (descriptor == null &&  field.getValueProviders() == null) {
+		if (descriptor == null && field.getValueProviders() == null) {
 			throw new InvalidFieldDescriptorException("Select components need an entity Descriptor ora valueProvider");
 		}
 
 		if (field.getValueProviders() != null) {
-			
-			
-			
+
 			List<Displayable> displayables = new ArrayList<Displayable>();
-			for(Class<? extends Enum> clazz : field.getValueProviders()) {
-//				try {
-//					 Enum e = clazz.getConstructor().newInstance();
-					List<String> enumsValue = Arrays.asList(clazz.getEnumConstants()).stream().map(e -> e.name()).collect(Collectors.toList());
-					 	displayables.addAll( enumsValue.stream().map(s -> {
-						SimpleDisplayable t = new SimpleDisplayable(s);
-						return t;
-						}).collect(Collectors.toList()));
-					
+			
+			for (Class<? extends Enum> clazz : field.getValueProviders()) {
+
+				List<String> enumsValue = Arrays.asList(clazz.getEnumConstants()).stream().map(e -> e.name())
+						.collect(Collectors.toList());
+				displayables.addAll(enumsValue.stream().map(s -> {
+					SimpleDisplayable t = new SimpleDisplayable(s);
+					return t;
+				}).collect(Collectors.toList()));
+
 			}
 			this.valueProvider = displayables;
 			select.setItems((Collection<V>) displayables);
 			select.setItemLabelGenerator(i -> i.getLabel());
-//			fieldMainEntity = SimpleDisplayable.class;
 
-//			valueProviders = field.getValueProviders();
-//			select.setItemLabelGenerator(i -> i.getValues().stream()
-//					.filter(e ->{return e.equals(selectedEnum);}).findFirst().map(o ->{
-//						return o.toString();
-//					}).orElseThrow( IllegalStateException::new));
-					
 		} else {
 
 			select.setItemLabelGenerator(i -> i.getLabel());
 
-			
-
 		}
 		fieldMainEntity = descriptor.getAnnotation(MainEntity.class).value();
 
-		
 		try {
 			Application appDescriptor = viewClazz.getConstructor().newInstance();
 			Optional<FieldDetail> matchingField = appDescriptor.getAllFields().stream().filter(f -> f.equals(field))
@@ -89,16 +75,11 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 				select.setLabel(TranslationUtils.translate(matchingField.get().getTranslationKey()));
 			}
 
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
-		
-		// select.setLabel(label);
-		select.addBlurListener(b -> {
 
-		});
 
 	}
 
@@ -111,40 +92,29 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 	public void initializeList(ServiceProxy serviceProxy) {
 		super.initializeList(serviceProxy);
 
-		if(serviceProxy != null && fieldMainEntity != null && serviceProxy.getInstance(fieldMainEntity) != null) {
+		if (serviceProxy != null && fieldMainEntity != null && serviceProxy.getInstance(fieldMainEntity) != null) {
 			List<Displayable> savedItems = serviceProxy.getInstance(fieldMainEntity).getAll();
-	//		itemsserviceProxy.getInstance(fieldMainEntity).getAll());
-	
-			
-			
+			// itemsserviceProxy.getInstance(fieldMainEntity).getAll());
+
 			if (valueProvider != null) {
-				if(field.isUnique()) {
+				if (field.isUnique()) {// we remove keys that are already persisted
 					Iterator<Displayable> itVlueProvider = (Iterator<Displayable>) valueProvider.iterator();
-					while(itVlueProvider.hasNext()) {
-						
+					while (itVlueProvider.hasNext()) {
+
+						// Removes all items that are already persisted 
 						Displayable v = itVlueProvider.next();
-						if(savedItems.stream().map(d -> d.getLabel()).collect(Collectors.toList()).contains(v.getLabel()))
+						if (savedItems.stream().map(d -> d.getLabel()).collect(Collectors.toList())
+								.contains(v.getLabel()))
 							itVlueProvider.remove();
-						
+
 					}
-					
-					
 				}
-				
-				
-			}else {
+
+			} else {//no value provider -> we take all keys
 				select.setItems((Collection<V>) savedItems);
 			}
-	
-	
-				select.addCustomValueSetListener(l -> {
-					System.out.println("gg");
-				});
-		
+
 		}
-//			SelectComponent.this.fireEvent<2>(new ComponentEvent(select.getParent().get(),
-//					Integer.parseInt(Long.toString(ComponentEvent.WINDOW_FOCUS_EVENT_MASK))));
-//		});
 	}
 
 	@Override
@@ -208,8 +178,7 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 
 	@Override
 	public void initialize() {
-		
-		
+
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Application  implements Serializable{
 
+	public static final String appPath = "application";
 	
 	String appName;
 	String appLabelKey;
@@ -14,12 +15,16 @@ public class Application  implements Serializable{
 	DetailLayoutManager dlManager;
 	TableLayoutManager tlManager;
 	
+	public String appPathLoc;
 	
     List<Action> action = new ArrayList<>();
+    
+    public String mainEntity;
   
     
     public Application() {
     	tlManager = new TableLayoutManager();
+    	dlManager = new DetailLayoutManager();
 	}
     
 	private boolean noTable;
@@ -100,5 +105,26 @@ public class Application  implements Serializable{
 	public void addAction(Action a) {
 		action.add(a);
 	}
+
+
+	public String getApppath() {
+		return appPathLoc;
+	}
+
+
+	public void setApppath(String apppath) {
+		this.appPathLoc = apppath;
+	}
+
+
+	public String getMainEntity() {
+		return mainEntity;
+	}
+
+
+	public void setMainEntity(String mainEntity) {
+		this.mainEntity = mainEntity;
+	}
+	
 	
 }

@@ -19,10 +19,13 @@ import com.jonas.suivi.views.model.TableLayoutManager;
 @MainEntity(UserAccount.class)
 public class UserAccountDescriptor extends Application{
 
+	public static final String appPath = "/userAccounts";
 	
 	public UserAccountDescriptor() {
 		super();
 		this.setAppLabelKey(TranslationUtils.translate(EAppTranslation.APP_LABEL_USER_ACCOUNT.name()));
+		this.mainEntity = UserAccountDescriptor.class.getAnnotation(MainEntity.class).value().getSimpleName();
+		this.appPathLoc = appPath;
 		
 		FieldDetail loginField = new FieldDetail();
 		loginField.setType(Input.TEXT_INPUT);

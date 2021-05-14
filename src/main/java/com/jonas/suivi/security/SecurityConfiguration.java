@@ -25,13 +25,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()  
+        http.csrf().disable() 
+        
             .requestCache().requestCache(new CustomRequestCache()) 
+            
             .and().authorizeRequests() 
-            .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()  
-            .and().authorizeRequests().antMatchers(INDEX_URL).permitAll()
+            .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
+            .and().authorizeRequests().antMatchers(INDEX_URL).permitAll().antMatchers("/loginRemote").permitAll()
             .anyRequest().authenticated()  
-         
+
             .and().formLogin()  
             .loginPage(LOGIN_URL).permitAll()
             .loginProcessingUrl(LOGIN_PROCESSING_URL)  

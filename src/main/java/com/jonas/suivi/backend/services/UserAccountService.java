@@ -37,7 +37,7 @@ public class UserAccountService implements DisplayableService{
 		usrAccountRepo.save(usr);
 	}
 
-	private void encodePassword(String password, UserAccount usr) {
+	public void encodePassword(String password, UserAccount usr) {
 		PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 		usr.setPassword(encoder.encode(password));
 	}
