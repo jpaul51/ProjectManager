@@ -45,8 +45,8 @@ public class ViewState {
 		this.eventType = eventType;
 	}
 
-	public Displayable getCurrentDisplayable() {
-		return currentDisplayable;
+	public <T extends Displayable> T getCurrentDisplayable() {
+		return (T) currentDisplayable;
 	}
 
 	public void setCurrentDisplayable(Displayable currentDisplayable) {

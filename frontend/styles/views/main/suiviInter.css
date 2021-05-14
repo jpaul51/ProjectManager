@@ -91,3 +91,8 @@ color: var(--lumo-body-text-color);
 tr[part="row"] {
 	min-height: 150px;
 }
+
+.verticalNoPadding{
+	padding-left:0px;
+}
+

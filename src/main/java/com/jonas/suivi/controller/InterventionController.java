@@ -25,11 +25,11 @@ public class InterventionController {
 
 	}
 	
-	@RequestMapping(method = RequestMethod.GET, value = "/interventions")
+	@RequestMapping(method = RequestMethod.GET, value = InterventionDescriptor.appPath)
 	public List<Intervention> getAllInterventions(){
 		return  interService.getAll();
 	}
-	@RequestMapping(method = RequestMethod.GET, value = "/interventionDescriptor")
+	@RequestMapping(method = RequestMethod.GET, value = InterventionDescriptor.appPath +ControllerConstants.END_URI_DESCRIPTOR)
 	public InterventionDescriptor getDataDescriptor(){
 		return  new InterventionDescriptor();
 	}

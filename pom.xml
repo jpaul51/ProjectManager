@@ -10,8 +10,8 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<java.version>11</java.version>
-		<vaadin.version>18.0.5</vaadin.version>
+		<java.version>16</java.version>
+		<vaadin.version>19.0.6</vaadin.version>
 	</properties>
 
 	<parent>
@@ -67,6 +67,11 @@
 	</dependencyManagement>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.vaadin</groupId>
+			<artifactId>tinymce-for-flow</artifactId>
+			<version>3.1.0</version>
+		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<!-- Replace artifactId with vaadin-core to use only free components -->
@@ -187,8 +192,8 @@
 			<!-- Production mode is activated using -Pproduction -->
 			<id>production</id>
 			<properties>
-            <vaadin.productionMode>true</vaadin.productionMode>
-        	</properties>
+				<vaadin.productionMode>true</vaadin.productionMode>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -205,6 +210,10 @@
 						</executions>
 						<configuration>
 							<productionMode>true</productionMode>
+							<release>15</release>
+							<compilerArgs>
+								--enable-preview
+							</compilerArgs>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -218,6 +227,12 @@
 					<plugin>
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<release>15</release>
+							<compilerArgs>
+								--enable-preview
+							</compilerArgs>
+						</configuration>
 						<executions>
 							<execution>
 								<id>start-spring-boot</id>

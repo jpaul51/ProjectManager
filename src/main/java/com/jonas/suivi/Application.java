@@ -18,7 +18,7 @@ import com.vaadin.flow.theme.lumo.Lumo;
  *
  */
 @SpringBootApplication(exclude = ErrorMvcAutoConfiguration.class)
-@Theme(value = Lumo.class, variant = Lumo.DARK)
+@Theme(variant = Lumo.DARK)
 @PWA(name = "ProjectManager", shortName = "ProjectManager", offlineResources = {"images/logo.png"})
 public class Application extends SpringBootServletInitializer implements AppShellConfigurator {
 

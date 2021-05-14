@@ -13,7 +13,7 @@ public class ResultView implements Serializable {
     Set<FieldDetail> quickSearchList = new HashSet<>();
 
 	SortField sortField = new SortField();
-	
+	Integer linesPerPage = null;
 	
 	public ResultView() {
 
@@ -53,6 +53,16 @@ public class ResultView implements Serializable {
 
 	public void setSortField(SortField sortField) {
 		this.sortField = sortField;
+	}
+
+
+	public Integer getLinesPerPage() {
+		return linesPerPage;
+	}
+
+
+	public void setLinesPerPage(Integer linesPerPage) {
+		this.linesPerPage = linesPerPage;
 	}
 	
 	

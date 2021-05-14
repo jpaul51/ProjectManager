@@ -17,6 +17,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String LOGIN_PROCESSING_URL = "/login";
     private static final String LOGIN_FAILURE_URL = "/login?error";
     private static final String LOGIN_URL = "/login";
+    private static final String INDEX_URL = "/index.html";
     private static final String LOGOUT_SUCCESS_URL = "/login";
 
     @Autowired
@@ -28,8 +29,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .requestCache().requestCache(new CustomRequestCache()) 
             .and().authorizeRequests() 
             .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()  
+            .and().authorizeRequests().antMatchers(INDEX_URL).permitAll()
             .anyRequest().authenticated()  
-
+         
             .and().formLogin()  
             .loginPage(LOGIN_URL).permitAll()
             .loginProcessingUrl(LOGIN_PROCESSING_URL)  
@@ -53,7 +55,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/icons/**",
             "/images/**",
             "/styles/**",
-            "/h2-console/**");
+            "/h2-console/**",
+            "/sw-runtime-resources-precache.js");
     }
     
 }

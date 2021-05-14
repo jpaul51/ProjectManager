@@ -1,20 +1,20 @@
 package com.jonas.suivi.backend.model.impl;
 
-import javax.persistence.Entity;
+import java.time.LocalDateTime;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-
-import org.joda.time.DateTime;
+import javax.persistence.MappedSuperclass;
 
 import com.jonas.suivi.backend.model.Displayable;
 
-@Entity
-public class Note implements Displayable {
+@MappedSuperclass
+public class Note {
 
 	@Id @GeneratedValue
 	private Long id;
 	private  String data;
-	private DateTime createdDate;
+	private LocalDateTime createdDate;
 	private Person author;
 	
 	public Long getId() {
@@ -29,10 +29,11 @@ public class Note implements Displayable {
 	public void setData(String data) {
 		this.data = data;
 	}
-	public DateTime getCreatedDate() {
+	
+	public LocalDateTime getCreatedDate() {
 		return createdDate;
 	}
-	public void setCreatedDate(DateTime createdDate) {
+	public void setCreatedDate(LocalDateTime createdDate) {
 		this.createdDate = createdDate;
 	}
 	public Person getAuthor() {
@@ -67,11 +68,7 @@ public class Note implements Displayable {
 		return true;
 	}
 	
-	@Override
-	public String getLabel() {
-		return this.getData();
-	}
-	
+
 	
 	
 	

@@ -75,4 +75,20 @@ vaadin-grid vaadin-grid-cell-content {
 	    font-size: var(--lumo-font-size-m)
 	
 }
+.verticalNoPadding{
+	padding-left:0px !important;
+}
 
+.editorNoMargin{
+	margin-left:0px !important;
+}
+
+.htmlContainer{
+	overflow-y:auto;
+	overflow-x:auto;
+
+	max-height:300px;
+	min-height:150px;
+	scrollbar-color: aliceblue #3b5678;/** firefox only :(**/
+
+}

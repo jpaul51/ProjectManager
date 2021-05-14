@@ -1,5 +1,7 @@
 package com.jonas.suivi.backend.model.impl;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -7,12 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.joda.time.DateTime;
-
 import com.jonas.suivi.backend.model.Displayable;
 
 @Entity
-public class Ticket implements Displayable{
+public class Ticket implements Displayable, Serializable{
 	
 	@Id @GeneratedValue
 	private Long id;
@@ -21,14 +21,16 @@ public class Ticket implements Displayable{
 	private String description;
 	private Project project;
 	private Person reporter;	
-	private DateTime createdDate;
+	private LocalDateTime createdDate;
 	
 	@OneToMany
-	private List<Note> notes;
+	private List<TicketNote> notes;
 	
 	private ETicketStatus ticketStatus;
 	private ETicketType ticketType;
 	private ETicketPriority ticketPriority;
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -59,16 +61,20 @@ public class Ticket implements Displayable{
 	public void setReporter(Person reporter) {
 		this.reporter = reporter;
 	}
-	public DateTime getCreatedDate() {
+	
+	
+	
+	public LocalDateTime getCreatedDate() {
 		return createdDate;
 	}
-	public void setCreatedDate(DateTime createdDate) {
+	public void setCreatedDate(LocalDateTime createdDate) {
 		this.createdDate = createdDate;
 	}
-	public List<Note> getNotes() {
+	
+	public List<TicketNote> getNotes() {
 		return notes;
 	}
-	public void setNotes(List<Note> notes) {
+	public void setNotes(List<TicketNote> notes) {
 		this.notes = notes;
 	}
 	public ETicketStatus getTicketStatus() {
@@ -89,20 +95,15 @@ public class Ticket implements Displayable{
 	public void setTicketPriority(ETicketPriority ticketPriority) {
 		this.ticketPriority = ticketPriority;
 	}
+	
+	
+	
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((createdDate == null) ? 0 : createdDate.hashCode());
-		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((notes == null) ? 0 : notes.hashCode());
-		result = prime * result + ((project == null) ? 0 : project.hashCode());
-		result = prime * result + ((reporter == null) ? 0 : reporter.hashCode());
-		result = prime * result + ((ticketPriority == null) ? 0 : ticketPriority.hashCode());
-		result = prime * result + ((ticketStatus == null) ? 0 : ticketStatus.hashCode());
-		result = prime * result + ((ticketType == null) ? 0 : ticketType.hashCode());
-		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
 	@Override
@@ -114,46 +115,10 @@ public class Ticket implements Displayable{
 		if (getClass() != obj.getClass())
 			return false;
 		Ticket other = (Ticket) obj;
-		if (createdDate == null) {
-			if (other.createdDate != null)
-				return false;
-		} else if (!createdDate.equals(other.createdDate))
-			return false;
-		if (description == null) {
-			if (other.description != null)
-				return false;
-		} else if (!description.equals(other.description))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
-			return false;
-		if (notes == null) {
-			if (other.notes != null)
-				return false;
-		} else if (!notes.equals(other.notes))
-			return false;
-		if (project == null) {
-			if (other.project != null)
-				return false;
-		} else if (!project.equals(other.project))
-			return false;
-		if (reporter == null) {
-			if (other.reporter != null)
-				return false;
-		} else if (!reporter.equals(other.reporter))
-			return false;
-		if (ticketPriority != other.ticketPriority)
-			return false;
-		if (ticketStatus != other.ticketStatus)
-			return false;
-		if (ticketType != other.ticketType)
-			return false;
-		if (title == null) {
-			if (other.title != null)
-				return false;
-		} else if (!title.equals(other.title))
 			return false;
 		return true;
 	}

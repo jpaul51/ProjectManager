@@ -1,8 +1,6 @@
 package com.jonas.suivi.views.main;
 
 import java.beans.IntrospectionException;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
@@ -16,6 +14,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import com.jonas.suivi.backend.model.Displayable;
 import com.jonas.suivi.backend.model.Name;
@@ -56,7 +60,14 @@ public class GridView extends SingleView {
 	private ServiceProxy serviceProxy;
 	Grid<Displayable> grid;
 
-	String pageTitle="";
+	Example forcedExample;
+
+	String pageTitle = "";
+	private int currentPage;
+	private Integer pageSize;
+	private Page<Displayable> displayablePage;
+	private String searchedValue;
+
 	public GridView(Class<?> context, ServiceProxy serviceProxy, ViewState viewState) {
 		this(context, serviceProxy);
 		this.currentViewState = viewState;
@@ -64,14 +75,14 @@ public class GridView extends SingleView {
 
 	public GridView(Class<?> context, ServiceProxy serviceProxy) {
 		super(context, serviceProxy);
+		this.addClassName("verticalNoPadding");
 
 		if (application.getAppLabelKey() == null) {
 			pageTitle = "UNDEFINED";
 		} else {
 			pageTitle = application.getAppLabelKey();
 		}
-		
-		
+
 		if (currentViewState == null) {
 			currentViewState = new ViewState(null, EViewEventType.LOAD, viewClazz);
 		}
@@ -86,7 +97,9 @@ public class GridView extends SingleView {
 		grid.setHeight("300px");
 
 		grid.setSizeFull();
+		grid.setWidth("98%");
 
+		
 		VerticalLayout vl = initToolbar(grid);
 		try {
 			createGridClumns(grid);
@@ -104,22 +117,37 @@ public class GridView extends SingleView {
 		setGridEvents(grid);
 		this.add(vl);
 	}
-	
+
+	private void changePage(boolean next) {
+		if (next) {
+			if (currentPage + 1 < displayablePage.getTotalPages())
+				this.currentPage++;
+		} else {
+			if (currentPage > 0)
+				this.currentPage--;
+		}
+		reloadGrid();
+	}
+
 	public void selectItem(Displayable itemToSelect) {
 		this.grid.select(itemToSelect);
 	}
-	
+
 	public void refreshGrid() {
-		if(filteredDisplayables.size() == 0) {
-			this.grid.setItems(displayables);
+
+		if (this.filteredDisplayables.isEmpty()) {
+
+			this.grid.setItems(this.displayablePage.getContent());
 		}else {
-			this.grid.setItems(filteredDisplayables);
+			this.grid.setItems(this.filteredDisplayables);
+
 		}
+
 	}
 
 	@Override
 	public void reload() {
-		
+
 		reloadGrid();
 
 	}
@@ -127,10 +155,44 @@ public class GridView extends SingleView {
 	@PostConstruct
 	public void reloadGrid() {
 		DisplayableService displayableService = serviceProxy.getInstance(entityClazz);
-		displayables = displayableService
-				.getWithSorting(application.getTlManager().getDefaultResultView().getSortField());
-		filteredDisplayables = new ArrayList<>(displayables);
-		this.grid.setItems(displayables);
+
+		if (forcedExample == null) {
+			if (this.pageSize != null && (displayablePage == null || filteredDisplayables.isEmpty()
+					|| displayables.size() == filteredDisplayables.size())) {
+				displayablePage = displayableService.getWithSorting(
+						application.getTlManager().getDefaultResultView().getSortField(), this.currentPage,
+						this.pageSize);
+
+				displayables = displayablePage.getContent();
+			} else {
+				reloadWithFilter(grid, searchedValue);
+
+//				displayables = displayableService
+//						.getWithSorting(application.getTlManager().getDefaultResultView().getSortField());
+			}
+
+		} else {
+			if (this.pageSize != null && (displayablePage == null || filteredDisplayables.isEmpty()
+					|| displayables.size() == filteredDisplayables.size())) {
+
+				displayablePage = displayableService.getWithExampleAndSorting(forcedExample,
+						application.getTlManager().getDefaultResultView().getSortField(), this.currentPage,
+						this.pageSize);
+				displayables = displayablePage.getContent();
+
+			} else {
+				reloadWithFilter(grid, searchedValue);
+
+			}
+		}
+
+//		filteredDisplayables = new ArrayList<>(displayables);
+		if (filteredDisplayables.isEmpty()) {
+			this.grid.setItems(displayables);
+		} else {
+			this.grid.setItems(filteredDisplayables);
+		}
+
 	}
 
 	private void setGridEvents(Grid<Displayable> grid) {
@@ -142,13 +204,13 @@ public class GridView extends SingleView {
 
 				appCtx = EAPP_CONTEXT.UPDATE;
 
-
 				Displayable selectedDisplayabe = oDisplayable.get();
 				e.getSource().select(selectedDisplayabe);
 
 				ViewState openEditViewState = new ViewState(this, EViewEventType.OPEN_EDIT, selectedDisplayabe,
 						viewClazz);
-				propertyChangeSupport.firePropertyChange("viewState", currentViewState, openEditViewState);
+				propertyChangeSupport.firePropertyChange(ESplitViewEvents.VIEW_STATE.getValue(), currentViewState,
+						openEditViewState);
 
 			}
 		});
@@ -173,6 +235,11 @@ public class GridView extends SingleView {
 
 			if (resultView.getColumns().isEmpty()) {
 				resultView.setColumns(application.getAllFields());
+			}
+
+			if (resultView.getLinesPerPage() != null) {
+				this.currentPage = 0;
+				this.pageSize = resultView.getLinesPerPage();
 			}
 
 			for (FieldDetail column : resultView.getColumns()) {
@@ -314,10 +381,10 @@ public class GridView extends SingleView {
 			final EAPP_CONTEXT currentCtx = appCtx;
 
 			appCtx = EAPP_CONTEXT.ADD;
-			
-			ViewState openEditViewState = new ViewState(this, EViewEventType.OPEN_NEW,
-					viewClazz);
-			propertyChangeSupport.firePropertyChange("viewState", currentViewState, openEditViewState);
+
+			ViewState openEditViewState = new ViewState(this, EViewEventType.OPEN_NEW, viewClazz);
+			propertyChangeSupport.firePropertyChange(ESplitViewEvents.VIEW_STATE.getValue(), currentViewState,
+					openEditViewState);
 
 			grid.deselectAll();
 			grid.asSingleSelect().clear();
@@ -328,40 +395,33 @@ public class GridView extends SingleView {
 		sbox.setSuffixComponent(new Icon(VaadinIcon.SEARCH));
 		sbox.addKeyPressListener(Key.ENTER, sf -> {
 			String searchedValue = sbox.getValue();
-			if(searchedValue.strip().isBlank()) {
-				grid.setItems(displayables);
-			}else {
-				filteredDisplayables.clear();
-				filteredDisplayables.addAll(displayables.stream().filter(d -> {
-					return application.getTlManager().getDefaultResultView().getQuickSearchList().stream().anyMatch(f -> {
-						try {
-							Object displayableValue = propDescriptorByField.get(f).getReadMethod().invoke(d);
+			this.searchedValue = searchedValue;
+			reloadWithFilter(grid, searchedValue);
 
-							return (((String) displayableValue).toLowerCase()
-									.contains(searchedValue.toLowerCase().strip()));
-
-						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-							e1.printStackTrace();
-							return false;
-						}
-					});
-
-				}).collect(Collectors.toList()));
-			
-				grid.setItems(filteredDisplayables);
-			}
-			
 		});
 		Div searchDiv = new Div();
 		searchDiv.add(sbox);
 		sbox.focus();
 		hl.add(searchDiv);
 
-		Button btnRefresh = new Button("Refresh");
+		Button btnRefresh = new Button(new Icon(VaadinIcon.REFRESH));
 		btnRefresh.addClickListener(c -> {
 			reloadGrid();
 		});
 		hl.add(btnRefresh);
+
+		Button btnNextPage = new Button(">");
+		btnNextPage.addClickShortcut(Key.PAGE_DOWN);
+		btnNextPage.addClickListener(c -> {
+			changePage(true);
+		});
+		Button btnPrevPage = new Button("<");
+		btnPrevPage.addClickShortcut(Key.PAGE_UP);
+		btnPrevPage.addClickListener(c -> {
+			changePage(false);
+		});
+
+		hl.add(btnPrevPage, btnNextPage);
 
 		toolbar.getStyle().set("padding", "var(--lumo-space-s) var(--lumo-space-l)");
 		toolbar.getStyle().set("border-right", "10px");
@@ -369,6 +429,64 @@ public class GridView extends SingleView {
 		VerticalLayout vl = new VerticalLayout();
 		vl.add(toolbar);
 		return vl;
+	}
+
+	private void reloadWithFilter(Grid grid, String searchedValue) {
+		if (searchedValue == null || searchedValue.strip().isBlank()) {
+			displayables = displayableService
+					.getWithSorting(application.getTlManager().getDefaultResultView().getSortField());
+			filteredDisplayables = new ArrayList<>(displayables);
+			grid.setItems(filteredDisplayables);
+		} else {
+			filteredDisplayables.clear();
+
+			Example filterExample = generateExampleFromFilters(searchedValue.strip());
+
+			filteredDisplayables = displayableService.getWithExampleAndSorting(filterExample,
+					application.getTlManager().getDefaultResultView().getSortField());
+
+			grid.setItems(filteredDisplayables);
+		}
+	}
+
+	private Example generateExampleFromFilters(String filter) {
+		Example filterExample = null;
+
+		try {
+			Displayable currentExample = getEntityClazz().getConstructor().newInstance();
+
+			ExampleMatcher exampleMatcher = ExampleMatcher.matchingAny().withIgnoreCase()
+					.withStringMatcher(StringMatcher.CONTAINING);
+
+			application.getTlManager().getDefaultResultView().getQuickSearchList().forEach(filterField -> {
+				PropertyDescriptor pd;
+				try {
+					pd = new PropertyDescriptor(filterField.getName(), entityClazz);
+					pd.getWriteMethod().invoke(currentExample, filter);
+
+					exampleMatcher.withMatcher(filterField.getName(),
+							ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+
+				} catch (IntrospectionException e1) {
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
+					e1.printStackTrace();
+				} catch (IllegalArgumentException e1) {
+					e1.printStackTrace();
+				} catch (InvocationTargetException e1) {
+					e1.printStackTrace();
+				}
+
+//						filterField.getName()
+			});
+			filterExample = Example.of(currentExample, exampleMatcher);
+
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		return filterExample;
 	}
 
 	public Grid<Displayable> getGrid() {
@@ -395,7 +513,12 @@ public class GridView extends SingleView {
 		this.filteredDisplayables = filteredDisplayables;
 	}
 
-	
-	
-	
+	public Example getExample() {
+		return forcedExample;
+	}
+
+	public void setExample(Example example) {
+		this.forcedExample = example;
+	}
+
 }

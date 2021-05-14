@@ -14,6 +14,7 @@ import com.vaadin.flow.router.RouteAlias;
 
 @Route("login") 
 @RouteAlias("logout")
+@RouteAlias("index.html")
 @PageTitle("Login | Project manager")
 public class LoginView extends VerticalLayout implements BeforeEnterObserver, AfterNavigationObserver	{
 

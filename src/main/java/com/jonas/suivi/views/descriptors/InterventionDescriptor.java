@@ -18,6 +18,7 @@ import com.jonas.suivi.views.model.TableLayoutManager;
 @MainEntity(Intervention.class)
 public class InterventionDescriptor extends Application{
 
+	public final static String appPath = "/interventions";
 	
 	public InterventionDescriptor() {
 		super();
@@ -72,6 +73,7 @@ public class InterventionDescriptor extends Application{
 		
 		TableLayoutManager tbl = new TableLayoutManager();
 		tbl.getDefaultResultView().getQuickSearchList().addAll(Arrays.asList(descField, commentField));
+		tbl.getDefaultResultView().setLinesPerPage(10);
 		SortField sort = new SortField();
 		sort.addSort(modifiedDate);
 		tbl.getDefaultResultView().setSortField(sort);

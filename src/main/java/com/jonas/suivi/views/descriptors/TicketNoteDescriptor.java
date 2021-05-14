@@ -3,7 +3,7 @@ package com.jonas.suivi.views.descriptors;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-import com.jonas.suivi.backend.model.impl.Note;
+import com.jonas.suivi.backend.model.impl.TicketNote;
 import com.jonas.suivi.backend.util.TranslationUtils;
 import com.jonas.suivi.views.model.Application;
 import com.jonas.suivi.views.model.Bloc;
@@ -16,10 +16,10 @@ import com.jonas.suivi.views.model.Line;
 import com.jonas.suivi.views.model.ResultView;
 import com.jonas.suivi.views.model.TableLayoutManager;
 
-@MainEntity(Note.class)
-public class NoteDescriptor extends Application{
+@MainEntity(TicketNote.class)
+public class TicketNoteDescriptor extends Application{
 
-	public NoteDescriptor() {
+	public TicketNoteDescriptor() {
 		super();
 		
 		this.setAppLabelKey(TranslationUtils.translate(EAppTranslation.APP_LABEL_NOTE.name()));

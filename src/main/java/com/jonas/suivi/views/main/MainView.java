@@ -5,13 +5,13 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Scope;
 
 import com.jonas.suivi.UserContextFactory;
 import com.jonas.suivi.views.about.AboutView;
 import com.jonas.suivi.views.descriptors.InterventionDescriptor;
 import com.jonas.suivi.views.descriptors.PersonDescriptor;
 import com.jonas.suivi.views.descriptors.ProjectDescriptor;
+import com.jonas.suivi.views.descriptors.TicketDescriptor;
 import com.jonas.suivi.views.descriptors.TranslationDescriptor;
 import com.jonas.suivi.views.descriptors.UserAccountDescriptor;
 import com.jonas.suivi.views.helloworld.HomeView;
@@ -119,8 +119,8 @@ public class MainView extends AppLayout {
         HorizontalLayout logoLayout = new HorizontalLayout();
         logoLayout.setId("logo");
         logoLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-        logoLayout.add(new Image("images/logo.png", "SuiviInter logo"));
-        logoLayout.add(new H1("SuiviInter"));
+        logoLayout.add(new Image("images/logo.png", "ProjectManager logo"));
+        logoLayout.add(new H1("Project Manager"));
         layout.add(logoLayout, menu);
         return layout;
     }
@@ -152,6 +152,9 @@ public class MainView extends AppLayout {
     	RouterLink rtInter = new RouterLink();
     	Div menuInterDiv = createMenuDiv("Interventions", rtInter);
     	
+    	RouterLink rtTicket = new RouterLink();
+    	Div menuTicketDiv = createMenuDiv("Tickets", rtTicket);
+    	
     	RouterLink rtTranslation = new RouterLink();
     	Div menuTranslationDiv = createMenuDiv("Translations", rtTranslation);
 
@@ -163,6 +166,13 @@ public class MainView extends AppLayout {
     		dvf.show();
     		viewTitle.setText(dvf.getAppTitle());
     	});
+    	
+    	menuTicketDiv.addClickListener(e -> {
+    		SplitViewFactory dvf = new SplitViewFactory(TicketDescriptor.class);
+    		dvf.show();
+    		viewTitle.setText(dvf.getAppTitle());
+    	});
+    	
     	
     	menuPersonDiv.addClickListener(e -> {
     		SplitViewFactory dvf = new SplitViewFactory(PersonDescriptor.class);
@@ -193,7 +203,7 @@ public class MainView extends AppLayout {
     		
     	});
     	
-    	tabs.add(createTab(menuDiv), createTab(menuPersonDiv), createTab(menuInterDiv), createTab(menuTranslationDiv),createTab(menuUserAccountDiv));
+    	tabs.add(createTab(menuDiv), createTab(menuPersonDiv), createTab(menuInterDiv), createTab(menuTicketDiv), createTab(menuTranslationDiv),createTab(menuUserAccountDiv));
 
 
         return tabs;

@@ -57,27 +57,30 @@ public class TicketDescriptor extends Application {
 	ticketStatus.setValueProviders(ETicketStatus.class);		
 	ticketStatus.setName("ticketStatus");
 	ticketStatus.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_STATUS.name());
+	ticketStatus.setEntityDescriptor(TicketDescriptor.class);
 
 	FieldDetailList ticketType= new FieldDetailList();
 	ticketType.setValueProviders(ETicketType.class);		
 	ticketType.setName("ticketType");
 	ticketType.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_TYPE.name());
+	ticketType.setEntityDescriptor(TicketDescriptor.class);
 	
 	FieldDetailList ticketPriority= new FieldDetailList();
 	ticketPriority.setValueProviders(ETicketPriority.class);		
 	ticketPriority.setName("ticketPriority");
 	ticketPriority.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_PRIORITY.name());
+	ticketPriority.setEntityDescriptor(TicketDescriptor.class);
 
-	FieldDetailList notetField = new FieldDetailList();
+	FieldDetailList notetField = new FieldDetailList(true);
 	notetField .setTranslationKey(EAppTranslation.APP_LABEL_PROJECT.name());
 	notetField .setName("notes");
-	notetField .setEntityDescriptor(NoteDescriptor.class);
+	notetField .setEntityDescriptor(TicketNoteDescriptor.class);
 	notetField.setUnique(false);
 	
 	
 	
 	
-	this.setDlManager(DetailLayoutManager.createSimpleDetail(titleField, descField, ticketReporter, projectField, ticketPriority, createdDate));
+	this.setDlManager(DetailLayoutManager.createSimpleDetail(titleField, descField, ticketReporter, projectField, ticketPriority, createdDate, notetField));
 	
 
 	

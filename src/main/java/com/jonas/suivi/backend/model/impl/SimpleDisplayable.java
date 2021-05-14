@@ -27,7 +27,11 @@ public class SimpleDisplayable   implements Serializable, Displayable {
 		return value;
 	}
 	
-	
+	@Override
+	public void setId(Long id) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	public String getValue() {
 		return value;

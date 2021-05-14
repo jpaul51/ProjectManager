@@ -13,13 +13,15 @@ import org.springframework.stereotype.Component;
 import com.jonas.suivi.backend.model.impl.Intervention;
 import com.jonas.suivi.backend.model.impl.Person;
 import com.jonas.suivi.backend.model.impl.Project;
+import com.jonas.suivi.backend.model.impl.Ticket;
+import com.jonas.suivi.backend.model.impl.TicketNote;
 import com.jonas.suivi.backend.model.impl.Translation;
 import com.jonas.suivi.backend.model.impl.UserAccount;
 
 @Component
 public class ServiceProxy implements ApplicationContextAware{
 	
-    private final Map<String, DisplayableService> myServices = new HashMap<String, DisplayableService>();
+    private final Map<String, DisplayableService> myServices = new HashMap<>();
 	
 	@Autowired 
 	@Qualifier("Project")
@@ -35,11 +37,19 @@ public class ServiceProxy implements ApplicationContextAware{
 	
 	@Autowired 
 	@Qualifier("Translation")
-	private TranslationService translationService;
+	private DisplayableService translationService;
 
 	@Autowired 
 	@Qualifier("Account")
-	private UserAccountService userAccountService;
+	private DisplayableService userAccountService;
+	
+	@Autowired 
+	@Qualifier("Ticket")
+	private DisplayableService ticketService;
+	
+	@Autowired 
+	@Qualifier("TicketNote")
+	private DisplayableService noteService;
 
 	
 	
@@ -49,12 +59,14 @@ public class ServiceProxy implements ApplicationContextAware{
 	    INTERVENTION("Intervention", Intervention.class),
 	    PERSON("Person", Person.class),
 	    ACCOUNT("Account", UserAccount.class),
-	    TRANSLATION("Translation", Translation.class);
+	    TRANSLATION("Translation", Translation.class),
+	    TICKET("Ticket", Ticket.class),
+	    TICKETNOTE("TicketNote", TicketNote.class);
 
 	    private String serviceName;
 	    private Class<?> clazz;
 
-	    private static final Map<Class<?>, String> mapOfClassTypes = new HashMap<Class<?>, String>();
+	    private static final Map<Class<?>, String> mapOfClassTypes = new HashMap<>();
 
 	    static {
 	        //This little bit of black magic, basically sets up your 
@@ -87,7 +99,6 @@ public class ServiceProxy implements ApplicationContextAware{
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		// TODO Auto-generated method stub
         myServices.putAll(applicationContext.getBeansOfType(DisplayableService.class,false,true));
         
 	}

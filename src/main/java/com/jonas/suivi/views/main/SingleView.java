@@ -11,16 +11,22 @@ import com.jonas.suivi.backend.services.ServiceProxy;
 import com.jonas.suivi.views.descriptors.MainEntity;
 import com.jonas.suivi.views.model.Application;
 import com.jonas.suivi.views.model.FieldDetail;
+import com.vaadin.event.MouseEvents.DoubleClickEvent;
+import com.vaadin.event.MouseEvents.DoubleClickListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-public abstract class SingleView extends VerticalLayout{
+import net.bytebuddy.asm.Advice.This;
+
+public abstract class SingleView extends VerticalLayout implements DoubleClickListener{
 
 	Application application;
 	String pageTitle;
+
+
 	protected Class<? extends Application> viewClazz;
-	protected Class<Displayable> entityClazz;
+	public Class<Displayable> entityClazz;
 	protected Div toolbar;
 	
 	protected 	HashMap<FieldDetail, PropertyDescriptor> propDescriptorByField = new HashMap<>();
@@ -30,20 +36,17 @@ public abstract class SingleView extends VerticalLayout{
 	ViewState currentViewState;
 	
 	
-	protected EAPP_CONTEXT appCtx;
+	public EAPP_CONTEXT appCtx;
 	
 	protected final String CLASS_HEADER_LAYOUT = "header-layout";
 
-	protected DisplayableService displayableService;
+	public DisplayableService displayableService;
 	
-	protected SingleView parentView = null;
+	public ServiceProxy serviceProxy;
 	
-	public SingleView(Class<?> context, ServiceProxy serviceProxy, SingleView parent) {
-		this(context, serviceProxy);
-		this.parentView = parent;
-	}
 	
 	public SingleView(Class<?> context, ServiceProxy serviceProxy) {
+		this.serviceProxy = serviceProxy;
 		if (context != null) {
 			viewClazz = (Class<? extends Application>) context;
 			try {
@@ -75,6 +78,32 @@ public abstract class SingleView extends VerticalLayout{
 	
 	
 	
+	public Class<Displayable> getEntityClazz() {
+		return entityClazz;
+	}
+
+
+
+	public Div getToolbar() {
+		return toolbar;
+	}
+
+
+
+	public void setToolbar(Div toolbar) {
+		this.toolbar = toolbar;
+	}
+
+
+
+	public PropertyChangeSupport getPropertyChangeSupport() {
+		return propertyChangeSupport;
+	}
+
+	public void setPropertyChangeSupport(PropertyChangeSupport propertyChangeSupport) {
+		this.propertyChangeSupport = propertyChangeSupport;
+	}
+
 	public ViewState getCurrentViewState() {
 		return currentViewState;
 	}
@@ -85,17 +114,29 @@ public abstract class SingleView extends VerticalLayout{
 		this.currentViewState = currentViewState;
 	}
 
-	
-
-	public SingleView getParentView() {
-		return parentView;
-	}
-
-	public void setParentView(SingleView parentView) {
-		this.parentView = parentView;
-	}
 
 	public abstract void reload();
+
+
+
+	public Class<? extends Application> getCtx() {
+		return viewClazz;
+	}
 	
+	@Override
+	public void doubleClick(DoubleClickEvent event) {
+		this.propertyChangeSupport.firePropertyChange(ESplitViewEvents.DBL_CLICK.getValue(), null, this);
+		
+	}
+	
+	public String getPageTitle() {
+		return pageTitle;
+	}
+
+
+
+	public void setPageTitle(String pageTitle) {
+		this.pageTitle = pageTitle;
+	}
 	
 }

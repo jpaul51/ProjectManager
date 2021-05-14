@@ -31,6 +31,15 @@ public class Language implements Displayable{
 
 
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+
+
+
+
 	@Override
 	public Long getId() {
 		// TODO Auto-generated method stub

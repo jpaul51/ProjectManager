@@ -1,15 +1,25 @@
 package com.jonas.suivi.views.main;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 
 import com.jonas.suivi.backend.model.Displayable;
 import com.jonas.suivi.backend.model.impl.Translation;
@@ -20,6 +30,7 @@ import com.jonas.suivi.views.components.AbstractSuperCustomField;
 import com.jonas.suivi.views.components.AbstractSuperDisplayableComponent;
 import com.jonas.suivi.views.components.CheckComponent;
 import com.jonas.suivi.views.components.DateTimeComponent;
+import com.jonas.suivi.views.components.GridComponent;
 import com.jonas.suivi.views.components.LabelComponent;
 import com.jonas.suivi.views.components.RichTextEditorComponent;
 import com.jonas.suivi.views.components.SelectComponent;
@@ -32,13 +43,15 @@ import com.jonas.suivi.views.descriptors.EAppFieldsTranslation;
 import com.jonas.suivi.views.descriptors.FunctionalInterfaceLocalDateTime;
 import com.jonas.suivi.views.descriptors.InvalidFieldDescriptorException;
 import com.jonas.suivi.views.model.ActionType;
+import com.jonas.suivi.views.model.Application;
 import com.jonas.suivi.views.model.Bloc;
 import com.jonas.suivi.views.model.Detail;
+import com.jonas.suivi.views.model.Detail.DetailType;
 import com.jonas.suivi.views.model.FieldDetail;
 import com.jonas.suivi.views.model.FieldDetailList;
 import com.jonas.suivi.views.model.Input;
 import com.jonas.suivi.views.model.Line;
-import com.jonas.suivi.views.model.Detail.DetailType;
+import com.vaadin.event.MouseEvents.DoubleClickEvent;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
@@ -48,12 +61,13 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 
-public class DetailView extends SingleView{
+public class DetailView extends SingleView implements PropertyChangeListener{
 
 	
 	private Binder<Displayable> binder;
@@ -64,24 +78,25 @@ public class DetailView extends SingleView{
 
 	List<PushyView> lazyComponents = new ArrayList<>();
 
-	private ServiceProxy serviceProxy;
+	public ServiceProxy serviceProxy;
 	
 	Displayable currentDisplayable;
 	Label labelId = new Label();
 	
-	private Button cancel;
+	private Button btnCancel;
 	private Button btnSave;
 	private Button btnDelete;
 	
+	public List<GridComponent> gridComponents = new ArrayList<>();
+	
+	List<Displayable> childrenChangedToPersist = new ArrayList<>();
+	
 	
 	public DetailView(Class<?> context, ServiceProxy serviceProxy, ViewState viewState) {
-		this(context,serviceProxy);
+		super(context,serviceProxy);
 		this.currentViewState = viewState;
-	}
-	
-	
-	public DetailView(Class<?> context, ServiceProxy serviceProxy) {
-		super(context, serviceProxy);
+		this.appCtx = currentViewState.getEventType().equals(EViewEventType.OPEN_EDIT) ? EAPP_CONTEXT.UPDATE : EAPP_CONTEXT.ADD;
+		
 		binder = new Binder<>(this.entityClazz);
 		this.serviceProxy = serviceProxy;
 		
@@ -97,9 +112,15 @@ public class DetailView extends SingleView{
 		this.appCtx = currentViewState.getEventType().equals(EViewEventType.OPEN_EDIT) ? EAPP_CONTEXT.UPDATE : EAPP_CONTEXT.ADD;
 		
 		generateDetail();
+	}
+	
+	
+	public DetailView(Class<?> context, ServiceProxy serviceProxy) {
+		this(context, serviceProxy, null);
 
 	}
 	
+
 	private void generateDetail() {
 		Detail currentDt = null;
 		Optional<Detail> currentDtOpt = appCtx.equals(EAPP_CONTEXT.ADD)
@@ -125,9 +146,7 @@ public class DetailView extends SingleView{
 			for (Line l : b.getLines()) {
 
 				for (FieldDetail f : l.getFields()) {
-
-					createBinder(f);
-
+						createBinder(f);
 				}
 
 			}
@@ -176,10 +195,47 @@ public class DetailView extends SingleView{
 		} else {
 
 			this.currentDisplayable = object;
-			labelId.setText(pageTitle.concat(" ").concat(currentDisplayable.getId().toString()));
 			binder.readBean(object);
+			
+			this.gridComponents.forEach(gridComp ->{
+				Class<? extends Displayable> model = gridComp.getGridView().getEntityClazz();
+				
+				Optional<Field> optEntity = findCurrentDisplayableOfModel(model);
+		
+				if(!optEntity.isEmpty()) {
+					
+					Field currentGridEntity = optEntity.get();
+					try {
+						PropertyDescriptor pd = new PropertyDescriptor(currentGridEntity.getName(), model);
+						Displayable exDisp = model.getDeclaredConstructor().newInstance();
+//						exDisp.setId(currentDisplayable.getId());
+						Displayable currentExample = getEntityClazz().getConstructor().newInstance();
+						currentExample.setId(currentDisplayable.getId());
+						pd.getWriteMethod().invoke(exDisp, currentExample);
+						
+						ExampleMatcher matcher = Example.of(exDisp).getMatcher().withIgnoreNullValues();
+						
+						
+						gridComp.setFilter(Example.of(exDisp, matcher));
+
+					} catch (IntrospectionException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+						e.printStackTrace();
+					}
+				}
+
+				
+				gridComp.getGridView().reload();
+			});
+			
 		}
 
+	}
+
+
+	public void setLabel() {
+//		if(currentDisplayable.getId() == null && currentViewState)
+		
+//		labelId.setText(pageTitle.concat(" ").concat(currentDisplayable.getId().toString()));
 	}
 
 
@@ -234,6 +290,13 @@ public class DetailView extends SingleView{
 		case Input.DATE_TIME_ONLY:
 			component = new TimeComponent(field);
 			break;
+		case Input.ENTITY:
+			component = new GridComponent<>(field, serviceProxy);
+			component.getComponent().getElement().setAttribute("colspan", "2");
+			((GridComponent)component).getPropertyChangeSupport().addPropertyChangeListener(this);
+//			((GridView)component.getComponent()).setParentView(this);
+			gridComponents.add((GridComponent) component);
+			break;
 		case Input.TEXT_INPUT:
 		default:
 			component = new TextFieldComponent(field, translatedFieldLabel);
@@ -243,8 +306,10 @@ public class DetailView extends SingleView{
 		component.setFieldDetail(field);
 		component.setReadOnly(field.getReadOnly());
 
+		if(!field.getType().equals(Input.ENTITY)) {
+			binder.forField(component).bind(field.getName());
+		}
 		
-		binder.forField(component).bind(field.getName());
 		componentsByField.put(field, component);
 		formComponents.add(component);
 		formLayout.add(component.getComponent());
@@ -266,6 +331,7 @@ public class DetailView extends SingleView{
 		formDiv.getStyle().set("overflow-y", "auto");
 
 		formDiv.getClassNames().add("scrollable-div");
+		formDiv.getClassNames().add("verticalNoPadding");
 		panelDiv.getStyle().set("overflow", "hidden");
 		formDiv.getStyle().set("padding", "var(--lumo-space-m)");
 		panelDiv.getStyle().set("padding", "0px");
@@ -286,16 +352,18 @@ public class DetailView extends SingleView{
 		headerLayout.setWidthFull();
 		headerLayout.setSpacing(true);
 
-		cancel = new Button("Cancel");
-		btnSave = new Button("Save");
-		btnDelete = new Button("Delete");
+		btnCancel = new Button( new Icon(VaadinIcon.CLOSE_CIRCLE));
+		btnSave = new Button( new Icon(VaadinIcon.CHECK_CIRCLE));
+		btnDelete = new Button( new Icon(VaadinIcon.TRASH));
 		
-		cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+	
+		
+		btnCancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 		btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		btnDelete.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
 		HorizontalLayout buttonLayout = new HorizontalLayout();
-		buttonLayout.add(btnDelete, cancel, btnSave);
+		buttonLayout.add(btnDelete, btnCancel, btnSave);
 		buttonLayout.getClassNames().add("button-layout");
 		labelLayout.getClassNames().add("label-layout");
 
@@ -303,15 +371,15 @@ public class DetailView extends SingleView{
 			deleteDisplayable()
 		);
 
-		cancel.addClickShortcut(Key.ESCAPE);
+		btnCancel.addClickShortcut(Key.ESCAPE);
 		btnSave.addClickShortcut(Key.F2);
 		btnDelete.addClickShortcut(Key.KEY_S, KeyModifier.ALT);
 
-		cancel.addClickListener(e -> {
-			cancel.clickInClient();
+		btnCancel.addClickListener(e -> {
+//			btnCancel.clickInClient();
 			ViewState closeViewState = new ViewState(this, EViewEventType.CLOSE, currentDisplayable,
 					viewClazz);
-			propertyChangeSupport.firePropertyChange("viewState", currentViewState,closeViewState);
+			propertyChangeSupport.firePropertyChange(ESplitViewEvents.VIEW_STATE.getValue(), currentViewState,closeViewState);
 
 		});
 
@@ -319,7 +387,7 @@ public class DetailView extends SingleView{
 			saveDisplayable();
 			ViewState saveViewState = new ViewState(this, EViewEventType.SAVE, currentDisplayable,
 					viewClazz);
-			propertyChangeSupport.firePropertyChange("viewState", currentViewState, saveViewState);
+			propertyChangeSupport.firePropertyChange(ESplitViewEvents.VIEW_STATE.getValue(), currentViewState, saveViewState);
 
 		});
 		headerLayout.add(labelLayout, buttonLayout);
@@ -328,18 +396,21 @@ public class DetailView extends SingleView{
 
 	private void deleteDisplayable() {
 		if (currentDisplayable != null) {
-			displayableService.delete(currentDisplayable);
-			ViewState deleteViewState = new ViewState(this, EViewEventType.DELETE, 
+//			persistDeleteDisplayable();
+			ViewState deleteViewState = new ViewState(this, EViewEventType.DELETE, currentDisplayable,
 					viewClazz);
-			propertyChangeSupport.firePropertyChange("viewState", currentViewState, deleteViewState);
+			propertyChangeSupport.firePropertyChange(ESplitViewEvents.VIEW_STATE.getValue(), currentViewState, deleteViewState);
 			
 		}
 	}
 
+
+	public void persistDeleteDisplayable() {
+		displayableService.delete(currentDisplayable);
+	}
+
 	private void saveDisplayable() {
-		boolean isNew = false;
 		if (currentDisplayable == null) {
-			isNew = true;
 			try {
 				currentDisplayable = entityClazz.getConstructor().newInstance();
 
@@ -393,28 +464,81 @@ public class DetailView extends SingleView{
 
 			binder.writeBean(currentDisplayable);
 
-			if(this.appCtx.equals(EAPP_CONTEXT.ADD)) {
-				displayableService.create(currentDisplayable);
-			}else {
-				displayableService.update(currentDisplayable);				
-			}
-
 			application.getAction().stream().filter(a -> {
 				return a.getActionType().equals(ActionType.SUBMIT) & !a.isBefore();
 			}).forEach(a -> a.getServiceAction().accept(serviceProxy.getInstance(Translation.class)));
 			;
 
 			populateForm(currentDisplayable);
-			if (!isNew) {
-//				grid.getDataProvider().refreshItem(currentDisplayable);
-			} else {
-//				displayables.add(0, currentDisplayable);
-//				grid.setItems(displayables);
-			}
+
 
 		} catch (ValidationException e1) {
 			e1.printStackTrace();
 		}
+	}
+
+
+
+	public void persitDisplayable() {
+		
+		this.getChildrenChangedToPersist().forEach(d ->{
+			d.persitDisplayable(this);
+		});
+		
+		currentDisplayable.persitDisplayable(this);
+		
+		
+		currentDisplayable.updateLinks(this);
+		
+		this.getChildrenChangedToPersist().forEach(d ->{
+			d.updateLinks(this);
+		});
+		
+	}
+
+
+	public Optional<Field> findFieldListOfModel(Class<? extends Displayable> model) {
+		Optional<Field> optField = Arrays.asList(getEntityClazz().getDeclaredFields()).stream().filter(field ->{
+			  Type type =  field.getGenericType();
+			  if(type instanceof ParameterizedType) {
+				  ParameterizedType listArguments = (ParameterizedType) type;
+				  if(listArguments != null && listArguments.getActualTypeArguments().length > 0) {
+				        Class<?> entity = (Class<?>) listArguments.getActualTypeArguments()[0];
+				        if(entity.equals(model)) {
+				        	return true;
+				        }
+					  }
+			  }
+			 
+		      return false;
+		}).findFirst();
+		return optField;
+	}
+	
+	public Optional<Field> findFieldOfChild(Class<? extends Displayable> model, Class<? extends Displayable> childClazz) {
+		Optional<Field> optField = Arrays.asList(childClazz.getDeclaredFields()).stream().filter(field ->{
+			 
+			  if(field.getType().getClass().equals(model)) {
+				 
+				        	return true;
+					  
+			  }
+			 
+		      return true;
+		}).findFirst();
+		return optField;
+	}
+	
+	
+	private Optional<Field> findCurrentDisplayableOfModel(Class<? extends Displayable> model) {
+		Optional<Field> optEntity = Arrays.asList(model.getDeclaredFields()).stream().filter(field ->{
+			if(field.getType().equals(getEntityClazz())) {
+				return true;
+			}
+			 
+		      return false;
+		}).findFirst();
+		return optEntity;
 	}
 	
 	@Override
@@ -422,6 +546,81 @@ public class DetailView extends SingleView{
 		super.onAttach(attachEvent);
 		loadLazyComponents();
 	}
+
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {		
+		this.propertyChangeSupport.firePropertyChange(evt);
+	}
+	
+	public void refreshGridComponentOfContext(ViewState viewState, boolean delete) {
+		for(GridComponent gridComp : this.gridComponents) {
+			
+			if(gridComp.getContext().equals(viewState.getContext())) {
+				
+//				int indexOfSavedDisplayable = ((GridView)gridComp.getComponent()).getDisplayables().indexOf(viewState.getCurrentDisplayable()); 
+				int indexOfSavedDisplayableFiltered = ((GridView)gridComp.getComponent()).getFilteredDisplayables().indexOf(viewState.getCurrentDisplayable()); 
+				
+				if(indexOfSavedDisplayableFiltered != -1) {
+					if(delete) {
+						((GridView)gridComp.getComponent()).getFilteredDisplayables().remove(viewState.getCurrentDisplayable());
+						((GridView)gridComp.getComponent()).getDisplayables().remove(viewState.getCurrentDisplayable());
+					}else {
+						((GridView)gridComp.getComponent()).getFilteredDisplayables().set(indexOfSavedDisplayableFiltered, viewState.getCurrentDisplayable());
+					}
+				}else if(!delete){
+//					viewState.getCurrentDisplayable().
+					((GridView)gridComp.getComponent()).getFilteredDisplayables().add(0, viewState.getCurrentDisplayable());
+					((GridView)gridComp.getComponent()).getDisplayables().add(0, viewState.getCurrentDisplayable());
+				}
+				
+				((GridView)gridComp.getComponent()).refreshGrid();
+			}
+		}
+	}
+	/**
+	 * Assuming there is only one gridView of each type !
+	 * @param context
+	 */
+	public GridView findGridComponentOfContext(Class<? extends Application> context) {
+		Optional<GridComponent> optComponent = this.gridComponents.stream().filter(g -> g.getContext().equals(context)).findFirst();
+		if(optComponent.isPresent()) {
+			return (GridView) optComponent.get().getComponent();
+		}else {
+			return null;
+		}
+	}
+
+
+	public List<GridComponent> getGridComponents() {
+		return gridComponents;
+	}
+
+
+	public void setGridComponents(List<GridComponent> gridComponents) {
+		this.gridComponents = gridComponents;
+	}
+
+
+	public List<Displayable> getChildrenChangedToPersist() {
+		return childrenChangedToPersist;
+	}
+
+
+	public void setChildrenChangedToPersist(List<Displayable> childrenChangedToPersist) {
+		this.childrenChangedToPersist = childrenChangedToPersist;
+	}
+
+
+	public Displayable getCurrentDisplayable() {
+		return currentDisplayable;
+	}
+
+
+	public void setCurrentDisplayable(Displayable currentDisplayable) {
+		this.currentDisplayable = currentDisplayable;
+	}
+	
 	
 	
 	

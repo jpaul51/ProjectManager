@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Application  implements Serializable{
 
+	
 	String appName;
 	String appLabelKey;
 	
