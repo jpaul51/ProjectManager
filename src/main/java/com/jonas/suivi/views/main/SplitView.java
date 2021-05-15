@@ -218,6 +218,10 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 
 //			}
 			((DetailView) newvh.getCurrent()).populateForm(newViewState.getCurrentDisplayable());
+			
+			if(newvh.getParent().isGridView()) {
+				((GridView) newvh.getParent().getCurrent()).currentDisplayable = newViewState.getCurrentDisplayable();
+			}
 
 			yield null;
 		}
@@ -294,7 +298,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 			if (lastViewHistoryClosed.getParent().isGridView()) {
 				GridView gridView = (GridView) lastViewHistoryClosed.getParent().getCurrent();
 				gridView.getDisplayables().remove(oldViewState.getCurrentDisplayable());
-				gridView.getFilteredDisplayables().remove(oldViewState.getCurrentDisplayable());
 				gridView.refreshGrid();
 			} else {
 				ViewHistory parentViewHistory = lastViewHistoryClosed.getParent();
@@ -392,44 +395,23 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 
 	private void updateOrAddGridView(ViewState newViewState, GridView gridView) {
 		int indexOfSavedDisplayable = gridView.getDisplayables().indexOf(newViewState.getCurrentDisplayable());
-		int indexOfSavedDisplayableFiltered = gridView.getFilteredDisplayables()
-				.indexOf(newViewState.getCurrentDisplayable());
-		if (indexOfSavedDisplayable > -1) {
+//		int indexOfSavedDisplayableFiltered = gridView.getDisplayables()
+//				.indexOf(newViewState.getCurrentDisplayable());
+		if (indexOfSavedDisplayable > -1 || newViewState.getCurrentDisplayable().getId() == null) {
 			List<Displayable> newList = new ArrayList<>(gridView.getDisplayables());
-			newList.set(indexOfSavedDisplayable, newViewState.getCurrentDisplayable());
-			gridView.setDisplayables(newList);
-			if (indexOfSavedDisplayableFiltered != -1) {
-				gridView.getFilteredDisplayables().set(indexOfSavedDisplayableFiltered,
-						newViewState.getCurrentDisplayable());
-			}
-		} else {
-			List<Displayable> displayables = new ArrayList<Displayable>(gridView.getDisplayables());
-			displayables.add(0, newViewState.getCurrentDisplayable());
-
-			List<Displayable> filteredDisplayables = gridView.getFilteredDisplayables();
-			filteredDisplayables.add(0, newViewState.getCurrentDisplayable());
-
-			gridView.setDisplayables(displayables);
-			gridView.setFilteredDisplayables(filteredDisplayables);
+			
+			int index = indexOfSavedDisplayable > -1 ? indexOfSavedDisplayable : 0;
+			
+			newList.set(index, newViewState.getCurrentDisplayable());
+			gridView.getGrid().setItems(newList);
+			
 		}
-		gridView.refreshGrid();
+		
+//		gridView.refreshGrid();
 		gridView.selectItem(newViewState.getCurrentDisplayable());
 	}
 
-//	private void reloadSplitOnClose(ViewHistory lastVh) {
-//		if(lastVh.getParent() == null) {
-//			this.splitLayout.getSecondaryComponent().setVisible(false);
-//			((GridView)lastVh.getCurrent()).selectItem(null);
-//		}else {
-//			if (lastVh.getParent().isGridView()) {
-//				this.splitLayout.getSecondaryComponent().setVisible(false);
-//				((GridView)lastVh.getParent().getCurrent()).selectItem(null);
-//			} else {
-//				this.splitLayout.addToPrimary(findLastLeftView(lastVh).getCurrent());
-//			}
-//		}
-//		
-//	}
+
 
 	private ViewHistory findLastLeftView(ViewHistory fromView) {
 //		this.viewHistory.stream().filter(vh -> vh.equals(fromView)).

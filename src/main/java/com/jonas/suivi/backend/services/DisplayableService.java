@@ -40,10 +40,10 @@ public interface DisplayableService extends SearchInterface {
 
 	}
 
-	public default <T extends Displayable> List<T> getWithExampleAndSorting(Example example, SortField sort) {
-		return (List<T>) getRepo().findAll(example, Sort.by("id").descending());
-
-	}
+//	public default <T extends Displayable> List<T> getWithExampleAndSorting(Example example, SortField sort) {
+//		return (List<T>) getRepo().findAll(example, Sort.by("id").descending());
+//
+//	}
 
 	public default <T extends Displayable> Page<T> getWithExampleAndSorting(Example example, SortField sort, int page,
 			int size) {

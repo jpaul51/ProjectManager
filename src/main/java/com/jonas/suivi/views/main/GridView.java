@@ -54,8 +54,8 @@ import com.vaadin.flow.function.ValueProvider;
 public class GridView extends SingleView {
 
 	Displayable currentDisplayable;
-	List<Displayable> displayables = new ArrayList<>();
-	List<Displayable> filteredDisplayables = new ArrayList<>();
+//	List<Displayable> displayables = new ArrayList<>();
+//	List<Displayable> filteredDisplayables = new ArrayList<>();
 	private ServiceProxy serviceProxy;
 	Grid<Displayable> grid;
 
@@ -65,7 +65,8 @@ public class GridView extends SingleView {
 	private int currentPage;
 	private Integer pageSize;
 	private Page<Displayable> displayablePage;
-	private String searchedValue;
+	private String searchedValue = "";
+	private Displayable addedItem;
 
 	public GridView(Class<?> context, ServiceProxy serviceProxy, ViewState viewState) {
 		this(context, serviceProxy);
@@ -98,7 +99,6 @@ public class GridView extends SingleView {
 		grid.setSizeFull();
 		grid.setWidth("98%");
 
-		
 		VerticalLayout vl = initToolbar(grid);
 		try {
 			createGridClumns(grid);
@@ -134,13 +134,14 @@ public class GridView extends SingleView {
 
 	public void refreshGrid() {
 
-		if (this.filteredDisplayables.isEmpty()) {
+//		if (this.filteredDisplayables.isEmpty()) {
+		List<Displayable> currentPage = this.displayablePage.getContent();
 
-			this.grid.setItems(this.displayablePage.getContent());
-		}else {
-			this.grid.setItems(this.filteredDisplayables);
+		this.grid.setItems(currentPage);
+//		}else {
+//			this.grid.setItems(this.filteredDisplayables);
 
-		}
+//		}
 
 	}
 
@@ -153,44 +154,8 @@ public class GridView extends SingleView {
 
 	@PostConstruct
 	public void reloadGrid() {
-		DisplayableService displayableService = serviceProxy.getInstance(entityClazz);
 
-		if (forcedExample == null) {
-			if (this.pageSize != null && (displayablePage == null || filteredDisplayables.isEmpty()
-					|| displayables.size() == filteredDisplayables.size())) {
-				displayablePage = displayableService.getWithSorting(
-						application.getTlManager().getDefaultResultView().getSortField(), this.currentPage,
-						this.pageSize);
-
-				displayables = displayablePage.getContent();
-			} else {
-				reloadWithFilter(grid, searchedValue);
-
-//				displayables = displayableService
-//						.getWithSorting(application.getTlManager().getDefaultResultView().getSortField());
-			}
-
-		} else {
-			if (this.pageSize != null && (displayablePage == null || filteredDisplayables.isEmpty()
-					|| displayables.size() == filteredDisplayables.size())) {
-
-				displayablePage = displayableService.getWithExampleAndSorting(forcedExample,
-						application.getTlManager().getDefaultResultView().getSortField(), this.currentPage,
-						this.pageSize);
-				displayables = displayablePage.getContent();
-
-			} else {
-				reloadWithFilter(grid, searchedValue);
-
-			}
-		}
-
-//		filteredDisplayables = new ArrayList<>(displayables);
-		if (filteredDisplayables.isEmpty()) {
-			this.grid.setItems(displayables);
-		} else {
-			this.grid.setItems(filteredDisplayables);
-		}
+		reloadWithFilter(grid, searchedValue);
 
 	}
 
@@ -432,23 +397,23 @@ public class GridView extends SingleView {
 
 	private void reloadWithFilter(Grid grid, String searchedValue) {
 		if (searchedValue == null || searchedValue.strip().isBlank()) {
-			displayables = displayableService
-					.getWithSorting(application.getTlManager().getDefaultResultView().getSortField());
-			filteredDisplayables = new ArrayList<>(displayables);
-			grid.setItems(filteredDisplayables);
+			displayablePage = displayableService.getWithSorting(
+					application.getTlManager().getDefaultResultView().getSortField(), currentPage, pageSize);
+//			filteredDisplayables = new ArrayList<>(displayables);
 		} else {
-			filteredDisplayables.clear();
-			
-			Example filterExample = serviceProxy.getInstance(entityClazz).generateExampleFromFilters(searchedValue.strip(), application, entityClazz);
 
-			filteredDisplayables = displayableService.getWithExampleAndSorting(filterExample,
-					application.getTlManager().getDefaultResultView().getSortField());
+			Example filterExample = serviceProxy.getInstance(entityClazz)
+					.generateExampleFromFilters(searchedValue.strip(), application, entityClazz);
 
-			grid.setItems(filteredDisplayables);
+			displayablePage = displayableService.getWithExampleAndSorting(filterExample,
+					application.getTlManager().getDefaultResultView().getSortField(), currentPage, pageSize);
+
 		}
+		grid.setItems(displayablePage.getContent());
+		
+
 	}
 
-	
 	public Grid<Displayable> getGrid() {
 		return grid;
 	}
@@ -458,19 +423,11 @@ public class GridView extends SingleView {
 	}
 
 	public List<Displayable> getDisplayables() {
-		return displayables;
+		return displayablePage.getContent();
 	}
 
-	public void setDisplayables(List<Displayable> displayables) {
-		this.displayables = displayables;
-	}
-
-	public List<Displayable> getFilteredDisplayables() {
-		return filteredDisplayables;
-	}
-
-	public void setFilteredDisplayables(List<Displayable> filteredDisplayables) {
-		this.filteredDisplayables = filteredDisplayables;
+	public Page<Displayable> getDisplayablePage() {
+		return displayablePage;
 	}
 
 	public Example getExample() {
