@@ -47,41 +47,25 @@ public class InterventionService implements DisplayableService {
 	public <T extends Displayable> List<T> getWithSorting(SortField sort) {
 
 		List<Sort> sortList = new ArrayList<>();
-		int i = getSortList(sort, sortList);
+		int i = sort.getSortList(sortList);
 //		interRepo.findAll(PageRequest.of(1, 10));
 		return (List<T>) interRepo.findAll(sortList.get(i));
 	}
 
-	private int getSortList(SortField sort, List<Sort> sortList) {
-		int i = 0;
-		sort.getSortingByField().forEach(m -> {
-			Iterator<Entry<FieldDetail, SortType>> entrySetIterator = m.entrySet().iterator();
-			while (entrySetIterator.hasNext()) {
-				Entry<FieldDetail, SortType> entry = entrySetIterator.next();
-				entry.getKey().getName();
-				entry.getValue().name();
-				if (sortList.size() <= i) {
-					sortList.add(Sort.by(entry.getKey().getName()));
-				}
-				sortList.set(i, sortList.get(i).descending());
-//				sortdb.by(entry.getKey().getName()).descending();
-			}
-		});
-		return i;
-	}
+
 
 	@Override
 	public <T extends Displayable> Page<T> getWithExampleAndSorting(Example example, SortField sort, int page,
 			int size) {
 		List<Sort> sortList = new ArrayList<>();
-		int i = getSortList(sort, sortList);
+		int i = sort.getSortList(sortList);
 		return (Page<T>) getRepo().findAll(example, PageRequest.of(page, size, sortList.get(i)));
 	}
 
 	@Override
 	public <T extends Displayable> Page<T> getWithSorting(SortField sort, int page, int size) {
 		List<Sort> sortList = new ArrayList<>();
-		int i = getSortList(sort, sortList);
+		int i = sort.getSortList(sortList);
 
 		return (Page<T>) getRepo().findAll(PageRequest.of(page, size, sortList.get(i)));
 

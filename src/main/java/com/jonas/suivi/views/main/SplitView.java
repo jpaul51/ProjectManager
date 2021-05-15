@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jonas.suivi.UserContextFactory;
 import com.jonas.suivi.backend.model.Displayable;
-import com.jonas.suivi.backend.services.DisplayableService;
+import com.jonas.suivi.backend.services.SearchInterface;
 import com.jonas.suivi.backend.services.ServiceProxy;
 import com.jonas.suivi.views.descriptors.InvalidActionDescriptorException;
 import com.jonas.suivi.views.descriptors.InvalidFieldDescriptorException;
@@ -40,7 +40,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 	@Autowired
 	ServiceProxy serviceProxy;
 
-	DisplayableService displayableService;
+	SearchInterface displayableService;
 
 	/**
 	 * 

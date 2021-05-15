@@ -1,10 +1,9 @@
 package com.jonas.suivi.views.model;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jonas.suivi.backend.services.DisplayableService;
 import com.jonas.suivi.views.descriptors.FunctionalInterfaceLocalDateTime;
 
@@ -15,10 +14,8 @@ public class FieldDetail  implements Serializable {
 	String name;
 	String translationKey;
 	
-	Class<? extends Application > entityDescriptor;
-
 	
-//	Class<Enum<? extends Enum>> keyProvider;
+	Class<? extends Application > entityDescriptor;
 
 	
 	Boolean readOnly = false;
@@ -95,6 +92,16 @@ public class FieldDetail  implements Serializable {
 
 	public void setTranslationKey(String translationKey) {
 		this.translationKey = translationKey;
+	}
+	
+	@JsonProperty("entityDescriptor")
+	public String getEntityDescriptorName() {
+		if(entityDescriptor != null) {
+			return entityDescriptor.getSimpleName();	
+		}else {
+			return "";
+		}
+		
 	}
 
 	public Class<? extends Application > getEntityDescriptor() {

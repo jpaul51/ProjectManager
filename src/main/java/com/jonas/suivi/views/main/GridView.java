@@ -11,7 +11,6 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 import com.jonas.suivi.backend.model.Displayable;
 import com.jonas.suivi.backend.model.Name;
@@ -27,6 +25,7 @@ import com.jonas.suivi.backend.services.DisplayableService;
 import com.jonas.suivi.backend.services.ServiceProxy;
 import com.jonas.suivi.backend.util.TranslationUtils;
 import com.jonas.suivi.views.descriptors.InvalidFieldDescriptorException;
+import com.jonas.suivi.views.model.Application;
 import com.jonas.suivi.views.model.FieldDetail;
 import com.jonas.suivi.views.model.Input;
 import com.jonas.suivi.views.model.ResultView;
@@ -439,8 +438,8 @@ public class GridView extends SingleView {
 			grid.setItems(filteredDisplayables);
 		} else {
 			filteredDisplayables.clear();
-
-			Example filterExample = generateExampleFromFilters(searchedValue.strip());
+			
+			Example filterExample = serviceProxy.getInstance(entityClazz).generateExampleFromFilters(searchedValue.strip(), application, entityClazz);
 
 			filteredDisplayables = displayableService.getWithExampleAndSorting(filterExample,
 					application.getTlManager().getDefaultResultView().getSortField());
@@ -449,46 +448,7 @@ public class GridView extends SingleView {
 		}
 	}
 
-	private Example generateExampleFromFilters(String filter) {
-		Example filterExample = null;
-
-		try {
-			Displayable currentExample = getEntityClazz().getConstructor().newInstance();
-
-			ExampleMatcher exampleMatcher = ExampleMatcher.matchingAny().withIgnoreCase()
-					.withStringMatcher(StringMatcher.CONTAINING);
-
-			application.getTlManager().getDefaultResultView().getQuickSearchList().forEach(filterField -> {
-				PropertyDescriptor pd;
-				try {
-					pd = new PropertyDescriptor(filterField.getName(), entityClazz);
-					pd.getWriteMethod().invoke(currentExample, filter);
-
-					exampleMatcher.withMatcher(filterField.getName(),
-							ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-
-				} catch (IntrospectionException e1) {
-					e1.printStackTrace();
-				} catch (IllegalAccessException e1) {
-					e1.printStackTrace();
-				} catch (IllegalArgumentException e1) {
-					e1.printStackTrace();
-				} catch (InvocationTargetException e1) {
-					e1.printStackTrace();
-				}
-
-//						filterField.getName()
-			});
-			filterExample = Example.of(currentExample, exampleMatcher);
-
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		return filterExample;
-	}
-
+	
 	public Grid<Displayable> getGrid() {
 		return grid;
 	}

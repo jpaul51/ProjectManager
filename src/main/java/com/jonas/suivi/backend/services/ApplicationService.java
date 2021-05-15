@@ -15,7 +15,7 @@ import com.jonas.suivi.views.descriptors.MainEntity;
 import com.jonas.suivi.views.model.Application;
 
 @Service
-public class ApplicationService {
+public class ApplicationService implements SearchInterface {
 
 	@Autowired
 	ServiceProxy serviceProxy;
@@ -37,16 +37,28 @@ public class ApplicationService {
 	public List<Displayable> getDataFromDescriptor(String descriptorName) {
 
 		List<Displayable> data = null;
-		Optional<Application> optApp = getAppList().stream()
-				.filter(app -> app.getClass().getSimpleName().equals(descriptorName)).findFirst();
+		Optional<Application> optApp = getApplicationFromDescriptorName(descriptorName);
 
-		if(optApp.isPresent()) {
-			Class entity = optApp.get().getClass().getAnnotation(MainEntity.class).value();
+		if (optApp.isPresent()) {
+			Application app = optApp.get();
+
+			Class entity = getEntityFromApp(app);
 			data = serviceProxy.getInstance(entity).getAll();
 		}
-		
+
 		return data;
 
+	}
+
+	public Class<Displayable> getEntityFromApp(Application app) {
+		Class entity = app.getClass().getAnnotation(MainEntity.class).value();
+		return entity;
+	}
+
+	public Optional<Application> getApplicationFromDescriptorName(String descriptorName) {
+		Optional<Application> optApp = getAppList().stream()
+				.filter(app -> app.getClass().getSimpleName().equals(descriptorName)).findFirst();
+		return optApp;
 	}
 
 }

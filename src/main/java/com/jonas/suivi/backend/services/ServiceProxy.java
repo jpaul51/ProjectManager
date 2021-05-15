@@ -25,31 +25,31 @@ public class ServiceProxy implements ApplicationContextAware{
 	
 	@Autowired 
 	@Qualifier("Project")
-	private DisplayableService projectService;
+	private SearchInterface projectService;
 
 	@Autowired 
 	@Qualifier("Intervention")
-	private DisplayableService interService;
+	private SearchInterface interService;
 
 	@Autowired 
 	@Qualifier("Person")
-	private DisplayableService personService;
+	private SearchInterface personService;
 	
 	@Autowired 
 	@Qualifier("Translation")
-	private DisplayableService translationService;
+	private SearchInterface translationService;
 
 	@Autowired 
 	@Qualifier("Account")
-	private DisplayableService userAccountService;
+	private SearchInterface userAccountService;
 	
 	@Autowired 
 	@Qualifier("Ticket")
-	private DisplayableService ticketService;
+	private SearchInterface ticketService;
 	
 	@Autowired 
 	@Qualifier("TicketNote")
-	private DisplayableService noteService;
+	private SearchInterface noteService;
 
 	
 	

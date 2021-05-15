@@ -1,7 +1,9 @@
 package com.jonas.suivi.backend.services;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map.Entry;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -10,9 +12,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.jonas.suivi.backend.model.Displayable;
+import com.jonas.suivi.views.model.FieldDetail;
 import com.jonas.suivi.views.model.SortField;
+import com.jonas.suivi.views.model.SortField.SortType;
 
-public interface DisplayableService {
+public interface DisplayableService extends SearchInterface {
 
 	public <T extends Displayable> List<T> getAll();
 
@@ -47,6 +51,8 @@ public interface DisplayableService {
 
 	}
 
+
+	
 	public <T extends Displayable> JpaRepository<T, Long> getRepo();
 
 	/**
@@ -56,5 +62,7 @@ public interface DisplayableService {
 	default public void reloadContext() {
 
 	}
+	
+	
 
 }
