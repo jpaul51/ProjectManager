@@ -67,6 +67,8 @@ public class GridView extends SingleView {
 	private Page<Displayable> displayablePage;
 	private String searchedValue = "";
 	private Displayable addedItem;
+	private Label lblCurrentPage;
+	private Label lblTotalPage;
 
 	public GridView(Class<?> context, ServiceProxy serviceProxy, ViewState viewState) {
 		this(context, serviceProxy);
@@ -125,6 +127,7 @@ public class GridView extends SingleView {
 			if (currentPage > 0)
 				this.currentPage--;
 		}
+		lblCurrentPage.setText(""+(this.currentPage+1));
 		reloadGrid();
 	}
 
@@ -360,6 +363,7 @@ public class GridView extends SingleView {
 		sbox.addKeyPressListener(Key.ENTER, sf -> {
 			String searchedValue = sbox.getValue();
 			this.searchedValue = searchedValue;
+			currentPage = 0;
 			reloadWithFilter(grid, searchedValue);
 
 		});
@@ -379,13 +383,22 @@ public class GridView extends SingleView {
 		btnNextPage.addClickListener(c -> {
 			changePage(true);
 		});
+
+		lblCurrentPage = new Label("1");
+		Label lblSeparator = new Label(" / ");
+		lblTotalPage = new Label("?");
+		
 		Button btnPrevPage = new Button("<");
 		btnPrevPage.addClickShortcut(Key.PAGE_UP);
 		btnPrevPage.addClickListener(c -> {
 			changePage(false);
 		});
 
-		hl.add(btnPrevPage, btnNextPage);
+		Div divPageCount = new Div();
+		divPageCount.add(lblCurrentPage, lblSeparator, lblTotalPage);
+		divPageCount.getStyle().set("padding-top", "9px");
+		
+		hl.add(btnPrevPage, divPageCount, btnNextPage);
 
 		toolbar.getStyle().set("padding", "var(--lumo-space-s) var(--lumo-space-l)");
 		toolbar.getStyle().set("border-right", "10px");
@@ -399,19 +412,19 @@ public class GridView extends SingleView {
 		if (searchedValue == null || searchedValue.strip().isBlank()) {
 			displayablePage = displayableService.getWithSorting(
 					application.getTlManager().getDefaultResultView().getSortField(), currentPage, pageSize);
-//			filteredDisplayables = new ArrayList<>(displayables);
 		} else {
 
-			Example filterExample = serviceProxy.getInstance(entityClazz)
+			Example<Displayable> filterExample = serviceProxy.getInstance(entityClazz)
 					.generateExampleFromFilters(searchedValue.strip(), application, entityClazz);
 
 			displayablePage = displayableService.getWithExampleAndSorting(filterExample,
 					application.getTlManager().getDefaultResultView().getSortField(), currentPage, pageSize);
 
 		}
+		lblCurrentPage.setText(this.currentPage+1+"");
+		lblTotalPage.setText(displayablePage.getTotalPages()+"");
 		grid.setItems(displayablePage.getContent());
 		
-
 	}
 
 	public Grid<Displayable> getGrid() {

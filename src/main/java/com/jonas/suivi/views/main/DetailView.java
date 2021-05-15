@@ -568,8 +568,9 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 						((GridView)gridComp.getComponent()).getDisplayables().set(indexOfSavedDisplayableFiltered, viewState.getCurrentDisplayable());
 					}
 				}else if(!delete){
-//					viewState.getCurrentDisplayable().
-					((GridView)gridComp.getComponent()).getDisplayables().add(0, viewState.getCurrentDisplayable());
+					List<Displayable> data = new ArrayList<>(((GridView)gridComp.getComponent()).getDisplayables());
+					data.add(0, viewState.getCurrentDisplayable());
+					((GridView)gridComp.getComponent()).getGrid().setItems(data);
 				}
 				
 				((GridView)gridComp.getComponent()).refreshGrid();
