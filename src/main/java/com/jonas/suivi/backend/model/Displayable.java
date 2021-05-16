@@ -22,6 +22,7 @@ public interface Displayable extends Serializable{
 	
 	public void setId(Long id);
 	
+	public void setSimpleValue(String value);
 	
 //	public void setValue();
 	

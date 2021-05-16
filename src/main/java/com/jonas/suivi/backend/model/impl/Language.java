@@ -8,17 +8,14 @@ import javax.persistence.Id;
 import com.jonas.suivi.backend.model.Displayable;
 import com.jonas.suivi.backend.model.Name;
 
-public class Language implements Displayable{
+public class Language implements Displayable {
 
-	
 	@Name("locale")
 	Locale languageLocale;
-	
-	@Id @GeneratedValue
+
+	@Id
+	@GeneratedValue
 	Long id;
-	
-	
-	
 
 	@Override
 	public String getLabel() {
@@ -26,19 +23,14 @@ public class Language implements Displayable{
 		return null;
 	}
 
-
-
-
-
+	@Override
+	public void setSimpleValue(String value) {
+		this.setSimpleValue(value);
+	}
 
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-
-
-
-
 
 	@Override
 	public Long getId() {

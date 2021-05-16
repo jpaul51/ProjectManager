@@ -1,5 +1,7 @@
 package com.jonas.suivi.views.components;
 
+import java.beans.PropertyChangeSupport;
+
 import com.jonas.suivi.views.model.FieldDetail;
 import com.vaadin.flow.component.Component;
 
@@ -10,6 +12,9 @@ public abstract class AbstractSuperComponent<U> extends Component {
 	boolean isReadOnly = false;
 	boolean isRequired = false;
 
+	protected PropertyChangeSupport propertyChangeSupport;
+
+	
 	public FieldDetail getFieldDetail() {
 		// TODO Auto-generated method stub
 		return field;
@@ -30,6 +35,16 @@ public abstract class AbstractSuperComponent<U> extends Component {
 	public String getFieldName() {
 		return field.getName();
 	}
+
+	public PropertyChangeSupport getPropertyChangeSupport() {
+		return propertyChangeSupport;
+	}
+
+	public void setPropertyChangeSupport(PropertyChangeSupport propertyChangeSupport) {
+		this.propertyChangeSupport = propertyChangeSupport;
+	}
+	
+	
 	
 //	public abstract void setValue(U value) ;
 

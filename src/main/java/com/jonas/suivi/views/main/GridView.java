@@ -8,24 +8,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 
 import com.jonas.suivi.backend.model.Displayable;
 import com.jonas.suivi.backend.model.Name;
-import com.jonas.suivi.backend.services.DisplayableService;
 import com.jonas.suivi.backend.services.ServiceProxy;
 import com.jonas.suivi.backend.util.TranslationUtils;
 import com.jonas.suivi.views.descriptors.InvalidFieldDescriptorException;
-import com.jonas.suivi.views.model.Application;
 import com.jonas.suivi.views.model.FieldDetail;
 import com.jonas.suivi.views.model.Input;
 import com.jonas.suivi.views.model.ResultView;
@@ -37,6 +32,7 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.GridSingleSelectionModel;
@@ -54,8 +50,6 @@ import com.vaadin.flow.function.ValueProvider;
 public class GridView extends SingleView {
 
 	Displayable currentDisplayable;
-//	List<Displayable> displayables = new ArrayList<>();
-//	List<Displayable> filteredDisplayables = new ArrayList<>();
 	private ServiceProxy serviceProxy;
 	Grid<Displayable> grid;
 
@@ -127,7 +121,7 @@ public class GridView extends SingleView {
 			if (currentPage > 0)
 				this.currentPage--;
 		}
-		lblCurrentPage.setText(""+(this.currentPage+1));
+		lblCurrentPage.setText("" + (this.currentPage + 1));
 		reloadGrid();
 	}
 
@@ -137,14 +131,9 @@ public class GridView extends SingleView {
 
 	public void refreshGrid() {
 
-//		if (this.filteredDisplayables.isEmpty()) {
 		List<Displayable> currentPage = this.displayablePage.getContent();
 
 		this.grid.setItems(currentPage);
-//		}else {
-//			this.grid.setItems(this.filteredDisplayables);
-
-//		}
 
 	}
 
@@ -341,6 +330,7 @@ public class GridView extends SingleView {
 		Button btnAdd = new Button(new Icon(VaadinIcon.PLUS));
 		btnAdd.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		hl.add(btnAdd);
+		
 		toolbar.add(hl);
 
 		btnAdd.addClickListener(e -> {
@@ -387,7 +377,7 @@ public class GridView extends SingleView {
 		lblCurrentPage = new Label("1");
 		Label lblSeparator = new Label(" / ");
 		lblTotalPage = new Label("?");
-		
+
 		Button btnPrevPage = new Button("<");
 		btnPrevPage.addClickShortcut(Key.PAGE_UP);
 		btnPrevPage.addClickListener(c -> {
@@ -397,8 +387,26 @@ public class GridView extends SingleView {
 		Div divPageCount = new Div();
 		divPageCount.add(lblCurrentPage, lblSeparator, lblTotalPage);
 		divPageCount.getStyle().set("padding-top", "9px");
+
+		HorizontalLayout endHl = new HorizontalLayout();
+		endHl.setAlignItems(Alignment.END);
+		endHl.setWidth("59%");
 		
-		hl.add(btnPrevPage, divPageCount, btnNextPage);
+		Button btnFilter = new Button("Filter");
+		
+		btnFilter.addClickListener(c -> {
+			Dialog d = new Dialog();
+			d.setCloseOnEsc(true);
+			d.setModal(true);
+			d.setHeightFull();
+			d.setWidthFull();
+			
+			d.add(new FilterView(application));
+			
+			d.open();
+		});
+		
+		hl.add(btnPrevPage, divPageCount, btnNextPage, endHl, btnFilter);
 
 		toolbar.getStyle().set("padding", "var(--lumo-space-s) var(--lumo-space-l)");
 		toolbar.getStyle().set("border-right", "10px");
@@ -421,10 +429,10 @@ public class GridView extends SingleView {
 					application.getTlManager().getDefaultResultView().getSortField(), currentPage, pageSize);
 
 		}
-		lblCurrentPage.setText(this.currentPage+1+"");
-		lblTotalPage.setText(displayablePage.getTotalPages()+"");
+		lblCurrentPage.setText(this.currentPage + 1 + "");
+		lblTotalPage.setText(displayablePage.getTotalPages() + "");
 		grid.setItems(displayablePage.getContent());
-		
+
 	}
 
 	public Grid<Displayable> getGrid() {

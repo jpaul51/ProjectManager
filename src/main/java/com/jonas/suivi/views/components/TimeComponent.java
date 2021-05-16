@@ -5,6 +5,8 @@ import java.time.LocalTime;
 
 import com.jonas.suivi.backend.util.TranslationUtils;
 import com.jonas.suivi.views.model.FieldDetail;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.shared.Registration;
 
@@ -12,6 +14,8 @@ public class TimeComponent extends AbstractSimpleSuperComponent < LocalTime> {
 	
 	
 	TimePicker component;
+	
+	HorizontalLayout hl = new HorizontalLayout();
 	
 	boolean isReadOnly = false;
 	boolean isRequired = false;
@@ -23,6 +27,7 @@ public class TimeComponent extends AbstractSimpleSuperComponent < LocalTime> {
 		component.setLocale(TranslationUtils.locale);
 		component.setMaxTime(LocalTime.of(23, 59));
 		setRequiredIndicatorVisible(true);
+		hl.add(component);
 		
 //		component.a
 		
@@ -34,6 +39,12 @@ public class TimeComponent extends AbstractSimpleSuperComponent < LocalTime> {
 		return component;
 	}
 
+	@Override
+	public Component getContainer() {
+		// TODO Auto-generated method stub
+		return hl;
+	}
+	
 	@Override
 	public LocalTime getValue() {
 		return component.getValue();

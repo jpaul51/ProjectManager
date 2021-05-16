@@ -2,11 +2,12 @@ package com.jonas.suivi.views.main;
 
 import com.jonas.suivi.backend.model.Displayable;
 import com.jonas.suivi.views.model.Application;
+import com.vaadin.flow.component.Component;
 
 public class ViewState {
 
 	
-	SingleView sender;
+	Component sender;
 	EViewEventType eventType;
 	Displayable currentDisplayable;
 	Class<? extends Application> context;
@@ -28,11 +29,24 @@ public class ViewState {
 		this.currentDisplayable = currentDisplayable;
 		this.context = context;
 	}
+	
+	public ViewState(Component sender, EViewEventType eventType, Displayable currentDisplayable,
+			Class<? extends Application> context) {
+		super();
+		this.sender = sender;
+		this.eventType = eventType;
+		this.currentDisplayable = currentDisplayable;
+		this.context = context;
+	}
 
-	public SingleView getSender() {
+	public Component getSender() {
 		return sender;
 	}
 
+	public boolean isSenderSingleView() {
+		return sender instanceof SingleView;
+	}
+	
 	public void setSender(SingleView sender) {
 		this.sender = sender;
 	}

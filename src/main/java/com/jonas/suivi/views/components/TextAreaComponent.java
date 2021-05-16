@@ -1,6 +1,7 @@
 package com.jonas.suivi.views.components;
 
 import com.jonas.suivi.views.model.FieldDetail;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.shared.Registration;
 
@@ -23,6 +24,10 @@ public class TextAreaComponent extends AbstractSimpleSuperComponent<String> {
 	@Override
 	public TextArea getComponent() {
 
+		return component;
+	}
+	@Override
+	public Component getContainer() {
 		return component;
 	}
 

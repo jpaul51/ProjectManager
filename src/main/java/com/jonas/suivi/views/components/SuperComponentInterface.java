@@ -42,5 +42,7 @@ public interface SuperComponentInterface<U extends Object, T extends Component >
 //		});
 
 	}
+
+	public Component getContainer();
 	
 }

@@ -23,6 +23,9 @@ public class TicketNote extends Note implements Displayable {
 	public String getLabel() {
 		return this.getData();
 	}
-	
+	@Override
+	public void setSimpleValue(String value) {
+		this.setData(value);
+	}
 	
 }

@@ -26,7 +26,10 @@ public class Translation implements Serializable, Displayable {
 	
 //	HashMap<Locale,String> transLationByLocale;
 	
-	
+	@Override
+	public void setSimpleValue(String value) {
+		this.setKey(new SimpleDisplayable(value));
+	}
 	
 	public String getTranslationByLocal(Locale loc) {
 		String ret = null;

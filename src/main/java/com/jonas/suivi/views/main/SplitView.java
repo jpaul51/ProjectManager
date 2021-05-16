@@ -14,9 +14,11 @@ import com.jonas.suivi.UserContextFactory;
 import com.jonas.suivi.backend.model.Displayable;
 import com.jonas.suivi.backend.services.SearchInterface;
 import com.jonas.suivi.backend.services.ServiceProxy;
+import com.jonas.suivi.views.components.AbstractSuperDisplayableComponent;
 import com.jonas.suivi.views.descriptors.InvalidActionDescriptorException;
 import com.jonas.suivi.views.descriptors.InvalidFieldDescriptorException;
 import com.jonas.suivi.views.model.Application;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.Shortcuts;
@@ -188,9 +190,9 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 			ViewHistory newvh = new ViewHistory();
 			newvh.setParent(vh);
 			newvh.setCurrent(dv);
-			newvh.setRight(vh.isGridView());
+			newvh.setRight(vh.isGridView() && newViewState.isSenderSingleView());
 
-			if (vh.isGridView()) {
+			if (vh.isRight()) {
 				this.splitLayout.addToSecondary(dv);
 			} else {
 				if (vh.getCurrent().getCtx().equals(dv.getCtx()) || (!vh.isGridView() && ((DetailView) vh.getCurrent())
@@ -218,8 +220,8 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 
 //			}
 			((DetailView) newvh.getCurrent()).populateForm(newViewState.getCurrentDisplayable());
-			
-			if(newvh.getParent().isGridView()) {
+
+			if (newvh.getParent().isGridView()) {
 				((GridView) newvh.getParent().getCurrent()).currentDisplayable = newViewState.getCurrentDisplayable();
 			}
 
@@ -231,7 +233,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 			ViewHistory newvh = new ViewHistory();
 			newvh.setParent(vh);
 			newvh.setCurrent(dv);
-			newvh.setRight(vh.isGridView());
+			newvh.setRight(vh.isGridView() && newViewState.isSenderSingleView());
 
 			// Allows multiple editing but only adding once is permited
 			if (!vh.getChildren().isEmpty()) {
@@ -245,7 +247,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 			}
 			vh.getChildren().add(newvh);
 
-			if (vh.isGridView()) {
+			if (newvh.isRight()) {
 				this.splitLayout.addToSecondary(dv);
 			} else {
 				this.splitLayout.addToPrimary(dv);
@@ -255,7 +257,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 			newvh.getCurrent().propertyChangeSupport.addPropertyChangeListener(this);
 			this.viewHistory.add(newvh);
 
-//			}
 			((DetailView) newvh.getCurrent()).populateForm(newViewState.getCurrentDisplayable());
 
 			yield newvh;
@@ -273,8 +274,10 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 				if (nextViewToOpen.getChildren().isEmpty()
 						&& !vh.getCurrent().getCtx().equals(nextViewToOpen.getCurrent().getCtx())) {
 
-					((DetailView) parentView.getCurrent()).findGridComponentOfContext(vh.getCurrent().getCtx())
-							.selectItem(null);
+					if (oldViewState.isSenderSingleView()) {
+						((DetailView) parentView.getCurrent()).findGridComponentOfContext(vh.getCurrent().getCtx())
+								.selectItem(null);
+					}
 					this.splitLayout.addToPrimary(
 							findLastGridLeftViewOfCtx(nextViewToOpen, nextViewToOpen.getCurrent().getCtx())
 									.getCurrent());
@@ -316,21 +319,33 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 
 			ViewHistory parentView = vh.getParent();
 
-			if (parentView.isGridView()) {
-				GridView gridView = (GridView) vh.getParent().getCurrent();
-				updateOrAddGridView(newViewState, gridView);
+			if (oldViewState.isSenderSingleView()) {
 
-			} else {
-				ViewHistory parentViewHistory = vh.getParent();
-				((DetailView) parentViewHistory.getCurrent()).refreshGridComponentOfContext(newViewState, false);
-				ViewHistory initialVh = findLastGridLeftViewOfCtx(vh, vh.getCurrent().getCtx());
-				if (initialVh != null) {
-					updateOrAddGridView(newViewState, (GridView) initialVh.getCurrent());
+				if (parentView.isGridView()) {
+					GridView gridView = (GridView) vh.getParent().getCurrent();
+					updateOrAddGridView(newViewState, gridView);
+
+				} else {
+					ViewHistory parentViewHistory = vh.getParent();
+					((DetailView) parentViewHistory.getCurrent()).refreshGridComponentOfContext(newViewState, false);
+					ViewHistory initialVh = findLastGridLeftViewOfCtx(vh, vh.getCurrent().getCtx());
+					if (initialVh != null) {
+						updateOrAddGridView(newViewState, (GridView) initialVh.getCurrent());
+					}
+
 				}
+				((DetailView) vh.getCurrent()).refreshGridComponentOfContext(newViewState, false);
+			} else {
+				AbstractSuperDisplayableComponent superComponent = (AbstractSuperDisplayableComponent) oldViewState
+						.getSender();
+				if (oldViewState.getEventType().equals(EViewEventType.OPEN_EDIT)) {
+					superComponent.editValue(newViewState.getCurrentDisplayable());
 
+				}else {
+					superComponent.addValue(newViewState.getCurrentDisplayable());
+
+				}
 			}
-			((DetailView) vh.getCurrent()).refreshGridComponentOfContext(newViewState, false);
-
 			if (parentView.getParent() == null) {// no persistence until main entity saved
 				((DetailView) vh.getCurrent()).persitDisplayable();
 			} else {
@@ -380,7 +395,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 
 	}
 
-	private Optional<ViewHistory> findViewHistoryOfSingleView(SingleView view) {
+	private Optional<ViewHistory> findViewHistoryOfSingleView(Component view) {
 		return this.viewHistory.stream().filter(vh -> vh.getCurrent() == view).findFirst();
 
 	}
@@ -399,19 +414,17 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 //				.indexOf(newViewState.getCurrentDisplayable());
 		if (indexOfSavedDisplayable > -1 || newViewState.getCurrentDisplayable().getId() == null) {
 			List<Displayable> newList = new ArrayList<>(gridView.getDisplayables());
-			
+
 			int index = indexOfSavedDisplayable > -1 ? indexOfSavedDisplayable : 0;
-			
+
 			newList.set(index, newViewState.getCurrentDisplayable());
 			gridView.getGrid().setItems(newList);
-			
+
 		}
-		
+
 //		gridView.refreshGrid();
 		gridView.selectItem(newViewState.getCurrentDisplayable());
 	}
-
-
 
 	private ViewHistory findLastLeftView(ViewHistory fromView) {
 //		this.viewHistory.stream().filter(vh -> vh.equals(fromView)).

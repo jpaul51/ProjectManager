@@ -28,7 +28,11 @@ public class RichTextEditorComponent extends AbstractSimpleSuperComponent<String
 		
 	}
 	
-
+@Override
+	public Component getContainer() {
+		// TODO Auto-generated method stub
+		return p;
+	}
 	
 
 	

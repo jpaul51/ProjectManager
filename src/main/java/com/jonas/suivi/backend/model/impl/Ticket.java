@@ -128,7 +128,10 @@ public class Ticket implements Displayable, Serializable{
 	}
 	
 	
-	
+	@Override
+	public void setSimpleValue(String value) {
+		this.setTitle(value);
+	}
 	
 	
 	

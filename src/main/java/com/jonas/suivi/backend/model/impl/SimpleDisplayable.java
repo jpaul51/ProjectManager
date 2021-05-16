@@ -17,6 +17,11 @@ public class SimpleDisplayable   implements Serializable, Displayable {
 	}
 	
 	@Override
+	public void setSimpleValue(String value) {
+		this.setValue(value);
+	}
+	
+	@Override
 	public Long getId() {
 		// TODO Auto-generated method stub
 		return null;

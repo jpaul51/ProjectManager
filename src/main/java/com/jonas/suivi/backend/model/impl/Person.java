@@ -27,7 +27,10 @@ public class Person  implements Serializable, Displayable {
 		this.firstName = name;
 	}
 
-	
+	@Override
+	public void setSimpleValue(String value) {
+		this.setLogin(value);
+	}
 	
 	
 	public void setId(Long id) {

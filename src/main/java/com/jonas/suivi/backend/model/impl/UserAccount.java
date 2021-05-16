@@ -19,6 +19,11 @@ public class UserAccount implements Displayable{
 	private boolean resetPassword = false;
 	
 	
+	@Override
+	public void setSimpleValue(String value) {
+		this.login = value;
+	}
+	
 	public String getLogin() {
 		return login;
 	}

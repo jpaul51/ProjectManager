@@ -26,6 +26,7 @@ import com.jonas.suivi.backend.model.impl.Translation;
 import com.jonas.suivi.backend.services.ServiceProxy;
 import com.jonas.suivi.backend.util.TranslationUtils;
 import com.jonas.suivi.views.components.AbstractSimpleSuperComponent;
+import com.jonas.suivi.views.components.AbstractSuperComponent;
 import com.jonas.suivi.views.components.AbstractSuperCustomField;
 import com.jonas.suivi.views.components.AbstractSuperDisplayableComponent;
 import com.jonas.suivi.views.components.CheckComponent;
@@ -273,6 +274,7 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 		case Input.SELECT:
 			try {
 				component = new SelectComponent<>((FieldDetailList)field, viewClazz);
+				((AbstractSuperComponent) component).getPropertyChangeSupport().addPropertyChangeListener(this);
 			} catch (InvalidFieldDescriptorException e) {
 				e.printStackTrace();
 				component = new LabelComponent(field, e.getLocalizedMessage());
@@ -310,9 +312,10 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 			binder.forField(component).bind(field.getName());
 		}
 		
+		component.getContainer().getElement().getStyle().set("padding-top", "var(--lumo-space-m)");
 		componentsByField.put(field, component);
 		formComponents.add(component);
-		formLayout.add(component.getComponent());
+		formLayout.add(component.getContainer());
 	}
 
 	private void createEditorLayout( ) {

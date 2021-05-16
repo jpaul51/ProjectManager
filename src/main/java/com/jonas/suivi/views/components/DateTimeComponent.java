@@ -6,13 +6,17 @@ import com.jonas.suivi.backend.util.TranslationUtils;
 import com.jonas.suivi.views.descriptors.FunctionalInterfaceLocalDateTime;
 import com.jonas.suivi.views.descriptors.InvalidFieldDescriptorException;
 import com.jonas.suivi.views.model.FieldDetail;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.shared.Registration;
 
 
 public class DateTimeComponent extends AbstractSimpleSuperComponent<LocalDateTime>  {
 	
 	DateTimePicker component;
+	HorizontalLayout hl = new HorizontalLayout();
 	LocalDateTime defaultValue;
 	FunctionalInterface provider;
 	FieldDetail field;
@@ -23,6 +27,8 @@ public class DateTimeComponent extends AbstractSimpleSuperComponent<LocalDateTim
 		component.setLabel(TranslationUtils.translate(field.getTranslationKey()));
 		component.setLocale(TranslationUtils.locale);
 		component.setAutoOpen(false);
+		
+		hl.add(component);
 		
 		if(field.getDefaultValue() != null) {
 			if(!(field.getDefaultValue() instanceof LocalDateTime) && 
@@ -36,7 +42,11 @@ public class DateTimeComponent extends AbstractSimpleSuperComponent<LocalDateTim
 	}
 
 
-	
+	@Override
+	public Component getContainer() {
+		// TODO Auto-generated method stub
+		return hl;
+	}
 	
 	@Override
 	public DateTimePicker getComponent() {

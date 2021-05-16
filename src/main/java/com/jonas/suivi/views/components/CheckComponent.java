@@ -15,6 +15,10 @@ public class CheckComponent extends AbstractSimpleSuperComponent<Boolean>{
 		checkBox.setLabel(label);
 	}
 	
+	@Override
+	public Component getContainer() {
+		return checkBox;
+	}
 	
 	@Override
 	public Component getComponent() {

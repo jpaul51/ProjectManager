@@ -37,6 +37,10 @@ public class GridComponent <V extends Displayable> extends AbstractSuperDisplaya
 		
 	}
 	
+	@Override
+	public Component getContainer() {
+		return gridView;
+	}
 	
 	public void setFilter(Example example) {
 		gridView.setExample(example);
@@ -46,6 +50,16 @@ public class GridComponent <V extends Displayable> extends AbstractSuperDisplaya
 		return gridView;
 	}
 
+	@Override
+	public void addValue(V val) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void editValue(V val) {
+		// TODO Auto-generated method stub
+		
+	}
 
 
 

@@ -16,13 +16,14 @@ import com.jonas.suivi.backend.model.Displayable;
 @Entity
 public class Intervention implements Serializable, Displayable {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	Long id;
 	private String description;
-	
+
 	@Column(length = 3000)
 	private String commentaire;
-	
+
 	@ManyToOne
 	private Person owner;
 	private LocalDateTime createdDate;
@@ -30,14 +31,14 @@ public class Intervention implements Serializable, Displayable {
 	private LocalTime duration;
 	@OneToOne
 	private Project project;
-	
-	
+
 	public Intervention() {
 		super();
 	}
 
-
-
+	public Intervention(String description) {
+		this.description = description;
+	}
 
 	public Intervention(String description, String commentaire, Person owner, LocalDateTime createdDate,
 			LocalDateTime lastModifiedDate) {
@@ -49,121 +50,75 @@ public class Intervention implements Serializable, Displayable {
 		this.lastModifiedDate = lastModifiedDate;
 	}
 
-
-	
-
-
+	@Override
+	public void setSimpleValue(String value) {
+		this.setDescription(value);
+	}
 
 	public String getDescription() {
 		return description;
 	}
 
-
-
-
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-
-
 
 	public String getCommentaire() {
 		return commentaire;
 	}
 
-
-
-
 	public void setCommentaire(String commentaire) {
 		this.commentaire = commentaire;
 	}
-
-
-
 
 	public Person getOwner() {
 		return owner;
 	}
 
-
-
-
 	public void setOwner(Person owner) {
 		this.owner = owner;
 	}
-
-
-
 
 	public LocalDateTime getCreatedDate() {
 		return createdDate;
 	}
 
-
-
-
 	public void setCreatedDate(LocalDateTime createdDate) {
 		this.createdDate = createdDate;
 	}
-
-
-
 
 	public LocalDateTime getLastModifiedDate() {
 		return lastModifiedDate;
 	}
 
-
-
-
 	public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
 	}
-
-
-
 
 	public LocalTime getDuration() {
 		return duration;
 	}
 
-
-
-
 	public void setDuration(LocalTime duration) {
 		this.duration = duration;
 	}
-
-
-
 
 	public Project getProject() {
 		return project;
 	}
 
-
-
-
 	public void setProject(Project project) {
 		this.project = project;
 	}
-
 
 	@Override
 	public Long getId() {
 		return id;
 	}
 
-
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-
-
-
-
 
 	@Override
 	public int hashCode() {
@@ -172,9 +127,6 @@ public class Intervention implements Serializable, Displayable {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
-
-
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -193,17 +145,11 @@ public class Intervention implements Serializable, Displayable {
 		return true;
 	}
 
-
-
-
 	@Override
 	public String getLabel() {
 		// TODO Auto-generated method stub
-		return "Intervention n°"+this.getId();
+		return "Intervention n°" + this.getId();
 	}
-
-
-
 
 //	@Override
 //	public ValueProvider<?, ?> getPropertyValue(ValueProvider provider) {
@@ -223,18 +169,10 @@ public class Intervention implements Serializable, Displayable {
 //		return null;
 //	}
 
-
-
-
 //	@Override
 //	public ValueProvider<? extends Serializable , ?> getPropertyValue(ValueProvider<? ,?> provider) {
 ////		provider.apply(this);
 //		return null;
 //	}
 
-
-
-
-	
-	
 }

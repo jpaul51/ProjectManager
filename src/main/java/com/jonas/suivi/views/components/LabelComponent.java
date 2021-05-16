@@ -1,6 +1,7 @@
 package com.jonas.suivi.views.components;
 
 import com.jonas.suivi.views.model.FieldDetail;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.shared.Registration;
 
@@ -19,6 +20,10 @@ public class LabelComponent extends AbstractSimpleSuperComponent<String> {
 	@Override
 	public TextField getComponent() {
 		// TODO Auto-generated method stub
+		return component;
+	}
+	@Override
+	public Component getContainer() {
 		return component;
 	}
 

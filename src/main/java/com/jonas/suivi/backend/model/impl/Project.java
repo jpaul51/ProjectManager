@@ -36,7 +36,10 @@ public class Project   implements Serializable, Displayable {
 		this.name = projectName;
 	}
 	
-	
+	@Override
+	public void setSimpleValue(String value) {
+		this.setName(value);
+	}
 	
 	
 	public void setId(Long id) {

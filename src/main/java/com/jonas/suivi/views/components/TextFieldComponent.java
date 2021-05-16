@@ -26,7 +26,10 @@ public class TextFieldComponent extends AbstractSimpleSuperComponent<String>{
 		return component;
 	}
 
-	
+	@Override
+	public Component getContainer() {
+		return component;
+	}
 
 	@Override
 	public String getValue() {
