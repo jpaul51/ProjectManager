@@ -6,6 +6,8 @@ public class UserContext {
 
 	private Class<? extends com.jonas.suivi.views.model.Application> currentClass;
 	private AbstractView view;
+	
+	
 
 	public Class<? extends com.jonas.suivi.views.model.Application> getCurrentClass() {
 		return currentClass;

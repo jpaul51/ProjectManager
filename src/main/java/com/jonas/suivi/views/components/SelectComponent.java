@@ -86,6 +86,10 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 			this.valueProvider = displayables;
 			select.setItems((Collection<V>) displayables);
 			select.setItemLabelGenerator(i -> i.getLabel());
+			
+			hl.setWidthFull();
+			container.setWidthFull();
+			select.setWidthFull();
 
 		} else {
 			select.setAllowCustomValue(true);
@@ -117,8 +121,8 @@ public class SelectComponent<V extends Displayable> extends AbstractSuperDisplay
 			btnLayout.add(btnEdit, btnAdd);
 			btnLayout.getStyle().set("padding-top", "32px");
 			hl.add(btnLayout);
-			layout.add(container);
 		}
+		layout.add(container);
 
 		fieldMainEntity = descriptor.getAnnotation(MainEntity.class).value();
 

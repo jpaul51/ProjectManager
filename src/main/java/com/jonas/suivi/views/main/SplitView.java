@@ -42,7 +42,6 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 	@Autowired
 	ServiceProxy serviceProxy;
 
-	SearchInterface displayableService;
 
 	/**
 	 * 
@@ -58,6 +57,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 	public SplitView() throws InvalidFieldDescriptorException, InvalidActionDescriptorException {
 		super();
 
+		
 		Command c = new Command() {
 
 			@Override
