@@ -1,6 +1,7 @@
 package com.jonas.suivi.views.main;
 
 import com.jonas.suivi.backend.model.Displayable;
+import com.jonas.suivi.views.components.AbstractSuperComponent;
 import com.jonas.suivi.views.model.Application;
 import com.vaadin.flow.component.Component;
 
@@ -45,6 +46,10 @@ public class ViewState {
 
 	public boolean isSenderSingleView() {
 		return sender instanceof SingleView;
+	}
+	
+	public boolean isSenderAComponent() {
+		return sender instanceof AbstractSuperComponent;
 	}
 	
 	public void setSender(SingleView sender) {

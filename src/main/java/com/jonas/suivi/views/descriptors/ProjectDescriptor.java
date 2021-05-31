@@ -12,6 +12,9 @@ import com.jonas.suivi.views.model.FieldDetail;
 import com.jonas.suivi.views.model.FieldDetailList;
 import com.jonas.suivi.views.model.Input;
 import com.jonas.suivi.views.model.Line;
+import com.jonas.suivi.views.model.ResultView;
+import com.jonas.suivi.views.model.SortField;
+import com.jonas.suivi.views.model.TableLayoutManager;
 
 
 
@@ -19,7 +22,7 @@ import com.jonas.suivi.views.model.Line;
 @MainEntity(Project.class)
 public class ProjectDescriptor extends Application{
 
-	public static final String appPath = "/projects";
+	public static final String appPath = "projects";
 	
 	public ProjectDescriptor() {
 		super();
@@ -44,9 +47,13 @@ public class ProjectDescriptor extends Application{
 		projectManager.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_MANAGER.name());
 		projectManager.setEntityDescriptor(PersonDescriptor.class);
 		
+		FieldDetail creationDate = new FieldDetail();
+		creationDate .setType(Input.DATE);
+		creationDate.setName("creationDate");
+		creationDate.setTranslationKey(EAppFieldsTranslation.APP_FIELDS_CREATED_DATE.name());
 		
 		Line headLine = new Line();
-		headLine.setFields(Arrays.asList(labelField, description, projectManager));
+		headLine.setFields(Arrays.asList(labelField, description, projectManager, creationDate));
 		
 		
 		Bloc bHeader = new Bloc();
@@ -57,6 +64,24 @@ public class ProjectDescriptor extends Application{
 		defaultDetail.setBlocs(Arrays.asList(bHeader));
 		
 		dl.setDefaultDetail(defaultDetail);
+		
+		TableLayoutManager tl = new TableLayoutManager();
+		
+		ResultView defaultResultView = new ResultView();
+		defaultResultView.setLabelKey("Projets actif");
+		defaultResultView.setLinesPerPage(10);
+		defaultResultView.setQuickSearchList(labelField, description);
+		
+		SortField sf = new SortField();
+		sf.addSort(creationDate);
+		defaultResultView.setSortField(sf);
+		
+		defaultResultView.setColumns(getAllFields());
+		
+		
+		tl.setDefaultResultView(defaultResultView);
+		
+		
 		
 		this.setDlManager(dl);
 		

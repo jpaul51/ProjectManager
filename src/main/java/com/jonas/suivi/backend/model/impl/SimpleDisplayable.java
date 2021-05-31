@@ -9,6 +9,8 @@ import com.jonas.suivi.backend.model.Displayable;
 public class SimpleDisplayable   implements Serializable, Displayable {
 
 	
+	private static final long serialVersionUID = 8053771748029272650L;
+	
 	@Id
 	String value;
 	
@@ -19,6 +21,12 @@ public class SimpleDisplayable   implements Serializable, Displayable {
 	@Override
 	public void setSimpleValue(String value) {
 		this.setValue(value);
+	}
+	
+	@Override
+	public Integer getState() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	@Override

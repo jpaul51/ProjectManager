@@ -22,6 +22,7 @@ public @interface Input {
 	public static String FILE_PDF="FILE_PDF";
 	public static String FILE_CANVAS="FILE_CANVAS";
 	public static String DATE_TIME="DATE_TIME";
+	public static String DATE="DATE";
 	public static String DATE_TIME_ONLY="DATE_TIME_ONLY";
 	public static String NUM_INTEGER="NUM_INTEGER";
 	public static String NUM_CURRENCY="NUM_CURRENCY";

@@ -14,6 +14,9 @@ import com.jonas.suivi.backend.model.Displayable;
 @Entity
 public class Ticket implements Displayable, Serializable{
 	
+
+	private static final long serialVersionUID = 1L;
+
 	@Id @GeneratedValue
 	private Long id;
 	
@@ -133,7 +136,11 @@ public class Ticket implements Displayable, Serializable{
 		this.setTitle(value);
 	}
 	
-	
+	@Override
+	public Integer getState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 	

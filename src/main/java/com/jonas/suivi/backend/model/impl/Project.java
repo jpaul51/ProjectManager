@@ -1,6 +1,7 @@
 package com.jonas.suivi.backend.model.impl;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -28,10 +29,26 @@ public class Project   implements Serializable, Displayable {
 	@ManyToOne
 	private Person projectManager;
 	
+	@Name("creationDate")
+	private LocalDate creationDate;
+	
+	Integer state;
+	
 	public Project() {
 		
 	}
 	
+	
+	
+	public Project(Long id, String name, Person projectManager) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.projectManager = projectManager;
+	}
+
+
+
 	public Project(String projectName) {
 		this.name = projectName;
 	}
@@ -41,6 +58,10 @@ public class Project   implements Serializable, Displayable {
 		this.setName(value);
 	}
 	
+	@Override
+	public Integer getState() {
+		return state;
+	}
 	
 	public void setId(Long id) {
 		this.id = id;
@@ -86,6 +107,16 @@ public class Project   implements Serializable, Displayable {
 	public Long getId() {
 		// TODO Auto-generated method stub
 		return id;
+	}
+
+	
+	
+	public LocalDate getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(LocalDate creationDate) {
+		this.creationDate = creationDate;
 	}
 
 	@Override

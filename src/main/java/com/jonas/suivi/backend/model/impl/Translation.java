@@ -12,78 +12,79 @@ import com.jonas.suivi.backend.model.Displayable;
 import com.jonas.suivi.backend.model.SimpleDisplayableConverter;
 import com.jonas.suivi.views.descriptors.ESupportedLocales;
 
-
 @Entity
 public class Translation implements Serializable, Displayable {
 
+	private static final long serialVersionUID = -4404844143349966021L;
+	
 	@Id
 	@GeneratedValue
 	Long id;
-    @Convert(converter = SimpleDisplayableConverter.class)
+	@Convert(converter = SimpleDisplayableConverter.class)
 	SimpleDisplayable key;
 	String frenchValue;
 	String englishValue;
-	
+
 //	HashMap<Locale,String> transLationByLocale;
-	
+
 	@Override
 	public void setSimpleValue(String value) {
 		this.setKey(new SimpleDisplayable(value));
 	}
-	
+
 	public String getTranslationByLocal(Locale loc) {
 		String ret = null;
-		
-		if(loc.equals(ESupportedLocales.FRANCE.getLocale()))
+
+		if (loc.equals(ESupportedLocales.FRANCE.getLocale()))
 			ret = frenchValue;
 		else
 			ret = englishValue;
-		
+
 		return ret;
 	}
-	
-	
+
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
-
-	
-
-
 
 	public SimpleDisplayable getKey() {
 		return key;
 	}
 
-
 	public void setKey(SimpleDisplayable key) {
 		this.key = key;
 	}
 
-
 	public String getFrenchValue() {
 		return frenchValue;
 	}
+
 	public void setFrenchValue(String frenchValue) {
 		this.frenchValue = frenchValue;
 	}
+
 	public String getEnglishValue() {
 		return englishValue;
 	}
+
 	public void setEnglishValue(String englishValue) {
 		this.englishValue = englishValue;
 	}
-	
-	
+
+	@Override
+	public Integer getState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	public String getLabel() {
 		return key.getLabel();
 	}
-
 
 	@Override
 	public int hashCode() {
@@ -92,7 +93,6 @@ public class Translation implements Serializable, Displayable {
 		result = prime * result + ((key == null) ? 0 : key.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -110,13 +110,5 @@ public class Translation implements Serializable, Displayable {
 			return false;
 		return true;
 	}
-	
 
-	
-
-	
-	
-	
-	
-	
 }

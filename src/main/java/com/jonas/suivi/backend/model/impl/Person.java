@@ -11,6 +11,8 @@ import com.jonas.suivi.backend.model.Displayable;
 @Entity
 public class Person  implements Serializable, Displayable {
 
+	private static final long serialVersionUID = 1222791412433960724l;
+	
 	@Id @GeneratedValue
 	Long id;
 	private String login;
@@ -32,6 +34,11 @@ public class Person  implements Serializable, Displayable {
 		this.setLogin(value);
 	}
 	
+	@Override
+	public Integer getState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	public void setId(Long id) {
 		this.id = id;

@@ -8,7 +8,7 @@ import com.jonas.suivi.views.model.FieldDetail;
 @MainEntity(Person.class)
 public class PersonDescriptor extends Application {
 
-		public static final String appPath = "/persons";
+		public static final String appPath = "persons";
 	
 	public PersonDescriptor() {
 		super();

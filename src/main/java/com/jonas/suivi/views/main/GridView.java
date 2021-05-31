@@ -221,6 +221,7 @@ public class GridView extends SingleView {
 						return new Html(stringcontent.toString());
 
 					}));
+					c.setAutoWidth(true);
 				} else if (column.getType().equals(Input.DATE_TIME)) {
 					c = grid.addColumn(new ComponentRenderer<>(disp -> {
 						Div d = new Div();

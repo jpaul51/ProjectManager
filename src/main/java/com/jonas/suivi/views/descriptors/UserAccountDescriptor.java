@@ -19,7 +19,7 @@ import com.jonas.suivi.views.model.TableLayoutManager;
 @MainEntity(UserAccount.class)
 public class UserAccountDescriptor extends Application{
 
-	public static final String appPath = "/userAccounts";
+	public static final String appPath = "userAccounts";
 	
 	public UserAccountDescriptor() {
 		super();

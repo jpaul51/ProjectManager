@@ -10,6 +10,10 @@ import com.jonas.suivi.backend.model.Name;
 
 public class Language implements Displayable {
 
+	
+
+	private static final long serialVersionUID = 716047712677136913L;
+
 	@Name("locale")
 	Locale languageLocale;
 
@@ -36,6 +40,12 @@ public class Language implements Displayable {
 	public Long getId() {
 		// TODO Auto-generated method stub
 		return id;
+	}
+	
+	@Override
+	public Integer getState() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

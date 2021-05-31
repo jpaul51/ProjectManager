@@ -2,6 +2,7 @@ package com.jonas.suivi.views.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,10 @@ public class ResultView implements Serializable {
 
 	SortField sortField = new SortField();
 	Integer linesPerPage = 5;
+	
+	
+	
+	String labelKey;
 	
 	public ResultView() {
 
@@ -34,6 +39,10 @@ public class ResultView implements Serializable {
 	public void setColumns(List<FieldDetail> columns) {
 		this.columns = columns;
 	}
+	
+	public void setColumns(FieldDetail... columns) {
+		this.columns.addAll(Arrays.asList(columns));
+	}
 
 
 	public Set<FieldDetail> getQuickSearchList() {
@@ -43,6 +52,10 @@ public class ResultView implements Serializable {
 
 	public void setQuickSearchList(Set<FieldDetail> quickSearchList) {
 		this.quickSearchList = quickSearchList;
+	}
+	
+	public void setQuickSearchList(FieldDetail ...quickSearchList) {
+		this.quickSearchList = Set.of(quickSearchList);
 	}
 
 
@@ -63,6 +76,16 @@ public class ResultView implements Serializable {
 
 	public void setLinesPerPage(Integer linesPerPage) {
 		this.linesPerPage = linesPerPage;
+	}
+
+
+	public String getLabelKey() {
+		return labelKey;
+	}
+
+
+	public void setLabelKey(String label) {
+		this.labelKey = label;
 	}
 	
 	

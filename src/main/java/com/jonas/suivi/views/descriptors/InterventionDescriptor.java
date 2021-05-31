@@ -18,11 +18,11 @@ import com.jonas.suivi.views.model.TableLayoutManager;
 @MainEntity(Intervention.class)
 public class InterventionDescriptor extends Application{
 
-	public final static String appPath = "/interventions";
+	public final static String appPath = "interventions";
 	
 	public InterventionDescriptor() {
 		super();
-		this.setAppLabelKey(TranslationUtils.translate(EAppTranslation.APP_LABEL_INTERVENTION.name()));
+		this.setAppLabelKey(EAppTranslation.APP_LABEL_INTERVENTION.name());
 		this.appPathLoc = InterventionDescriptor.appPath;
 		this.mainEntity = InterventionDescriptor.class.getAnnotation(MainEntity.class).value().getSimpleName();
 		FieldDetail descField = new FieldDetail();

@@ -30,6 +30,7 @@ import com.jonas.suivi.views.components.AbstractSuperComponent;
 import com.jonas.suivi.views.components.AbstractSuperCustomField;
 import com.jonas.suivi.views.components.AbstractSuperDisplayableComponent;
 import com.jonas.suivi.views.components.CheckComponent;
+import com.jonas.suivi.views.components.DateComponent;
 import com.jonas.suivi.views.components.DateTimeComponent;
 import com.jonas.suivi.views.components.GridComponent;
 import com.jonas.suivi.views.components.LabelComponent;
@@ -52,7 +53,6 @@ import com.jonas.suivi.views.model.FieldDetail;
 import com.jonas.suivi.views.model.FieldDetailList;
 import com.jonas.suivi.views.model.Input;
 import com.jonas.suivi.views.model.Line;
-import com.vaadin.event.MouseEvents.DoubleClickEvent;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
@@ -68,9 +68,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 
-public class DetailView extends SingleView implements PropertyChangeListener{
+public class DetailView extends SingleView implements PropertyChangeListener {
 
-	
 	private Binder<Displayable> binder;
 
 	HashMap<FieldDetail, SuperComponentInterface<?, ? extends Component>> componentsByField;
@@ -80,47 +79,46 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 	List<PushyView> lazyComponents = new ArrayList<>();
 
 	public ServiceProxy serviceProxy;
-	
+
 	Displayable currentDisplayable;
 	Label labelId = new Label();
-	
+
 	private Button btnCancel;
 	private Button btnSave;
 	private Button btnDelete;
-	
+
 	public List<GridComponent> gridComponents = new ArrayList<>();
-	
+
 	List<Displayable> childrenChangedToPersist = new ArrayList<>();
-	
-	
+
 	public DetailView(Class<?> context, ServiceProxy serviceProxy, ViewState viewState) {
-		super(context,serviceProxy);
+		super(context, serviceProxy);
 		this.currentViewState = viewState;
-		this.appCtx = currentViewState.getEventType().equals(EViewEventType.OPEN_EDIT) ? EAPP_CONTEXT.UPDATE : EAPP_CONTEXT.ADD;
-		
+		this.appCtx = currentViewState.getEventType().equals(EViewEventType.OPEN_EDIT) ? EAPP_CONTEXT.UPDATE
+				: EAPP_CONTEXT.ADD;
+
 		binder = new Binder<>(this.entityClazz);
 		this.serviceProxy = serviceProxy;
-		
+
 		pageTitle = application.getAppLabelKey();
-		
-		if(currentViewState == null) {
+
+		if (currentViewState == null) {
 			currentViewState = new ViewState(null, EViewEventType.OPEN_EDIT, viewClazz);
 		}
 		this.propertyChangeSupport = new PropertyChangeSupport(currentViewState);
-		
+
 		this.serviceProxy = serviceProxy;
-		
-		this.appCtx = currentViewState.getEventType().equals(EViewEventType.OPEN_EDIT) ? EAPP_CONTEXT.UPDATE : EAPP_CONTEXT.ADD;
-		
+
+		this.appCtx = currentViewState.getEventType().equals(EViewEventType.OPEN_EDIT) ? EAPP_CONTEXT.UPDATE
+				: EAPP_CONTEXT.ADD;
+
 		generateDetail();
 	}
-	
-	
+
 	public DetailView(Class<?> context, ServiceProxy serviceProxy) {
 		this(context, serviceProxy, null);
 
 	}
-	
 
 	private void generateDetail() {
 		Detail currentDt = null;
@@ -137,9 +135,9 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 
 		binder = new Binder(this.entityClazz);
 		componentsByField = new HashMap<>();
-		formComponents = new ArrayList<SuperComponentInterface<?,? extends Component>>();
+		formComponents = new ArrayList<SuperComponentInterface<?, ? extends Component>>();
 		formLayout = new FormLayout();
-		
+
 		createEditorLayout();
 
 		for (Bloc b : currentDt.getBlocs()) {
@@ -147,13 +145,13 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 			for (Line l : b.getLines()) {
 
 				for (FieldDetail f : l.getFields()) {
-						createBinder(f);
+					createBinder(f);
 				}
 
 			}
 
 		}
-			reloadEntityComponents();
+		reloadEntityComponents();
 
 	}
 
@@ -163,32 +161,28 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 		}
 	}
 
-	
-
-	
-
 	private void reloadEntityComponents() {
-		findEntityFieldsComponents().stream().forEach(s -> 
-			s.initializeList(serviceProxy)
-		);
+		findEntityFieldsComponents().stream().forEach(s -> s.initializeList(serviceProxy));
 	}
-	
+
 	private List<SuperComponentInterface<?, ? extends Component>> findEntityFieldsComponents() {
-		return componentsByField.entrySet().stream().filter(e -> e.getKey().getEntityDescriptor() != null || e.getKey() instanceof FieldDetailList)
+		return componentsByField.entrySet().stream()
+				.filter(e -> e.getKey().getEntityDescriptor() != null || e.getKey() instanceof FieldDetailList)
 				.map(m -> m.getValue()).collect(Collectors.toList());
 	}
-	
+
 	@Override
 	public void reload() {
 		populateForm(currentViewState.getCurrentDisplayable());
-		
+
 	}
 
 	public void populateForm(Displayable object) {
-		
+
 		if (object == null) {
-			
-			labelId.setText(TranslationUtils.translate(EAppFieldsTranslation.APP_FIELDS_ADD.name()).concat(" ").concat(TranslationUtils.translate(pageTitle)));
+
+			labelId.setText(TranslationUtils.translate(EAppFieldsTranslation.APP_FIELDS_ADD.name()).concat(" ")
+					.concat(TranslationUtils.translate(pageTitle)));
 			currentDisplayable = null;
 			for (SuperComponentInterface<?, ? extends Component> disp : formComponents) {
 				disp.initialize();
@@ -197,14 +191,14 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 
 			this.currentDisplayable = object;
 			binder.readBean(object);
-			
-			this.gridComponents.forEach(gridComp ->{
+
+			this.gridComponents.forEach(gridComp -> {
 				Class<? extends Displayable> model = gridComp.getGridView().getEntityClazz();
-				
+
 				Optional<Field> optEntity = findCurrentDisplayableOfModel(model);
-		
-				if(!optEntity.isEmpty()) {
-					
+
+				if (!optEntity.isEmpty()) {
+
 					Field currentGridEntity = optEntity.get();
 					try {
 						PropertyDescriptor pd = new PropertyDescriptor(currentGridEntity.getName(), model);
@@ -213,39 +207,33 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 						Displayable currentExample = getEntityClazz().getConstructor().newInstance();
 						currentExample.setId(currentDisplayable.getId());
 						pd.getWriteMethod().invoke(exDisp, currentExample);
-						
+
 						ExampleMatcher matcher = Example.of(exDisp).getMatcher().withIgnoreNullValues();
-						
-						
+
 						gridComp.setFilter(Example.of(exDisp, matcher));
 
-					} catch (IntrospectionException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					} catch (IntrospectionException | InstantiationException | IllegalAccessException
+							| IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+							| SecurityException e) {
 						e.printStackTrace();
 					}
 				}
 
-				
 				gridComp.getGridView().reload();
 			});
-			
+
 		}
 
 	}
 
-
 	public void setLabel() {
 //		if(currentDisplayable.getId() == null && currentViewState)
-		
+
 //		labelId.setText(pageTitle.concat(" ").concat(currentDisplayable.getId().toString()));
 	}
 
-
-
 	private void createBinder(FieldDetail field) {
 
-		
-		
-		
 		String translatedFieldLabel = TranslationUtils.translate(field.getTranslationKey());
 
 		String fieldType = field.getType();
@@ -273,7 +261,7 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 
 		case Input.SELECT:
 			try {
-				component = new SelectComponent<>((FieldDetailList)field, viewClazz);
+				component = new SelectComponent<>((FieldDetailList) field, viewClazz);
 				((AbstractSuperComponent) component).getPropertyChangeSupport().addPropertyChangeListener(this);
 			} catch (InvalidFieldDescriptorException e) {
 				e.printStackTrace();
@@ -289,13 +277,16 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 				component = new LabelComponent(field, e.getLocalizedMessage());
 			}
 			break;
+		case Input.DATE:
+			component = new DateComponent(field);
+			break;
 		case Input.DATE_TIME_ONLY:
 			component = new TimeComponent(field);
 			break;
 		case Input.ENTITY:
 			component = new GridComponent<>(field, serviceProxy);
 			component.getComponent().getElement().setAttribute("colspan", "2");
-			((GridComponent)component).getPropertyChangeSupport().addPropertyChangeListener(this);
+			((GridComponent) component).getPropertyChangeSupport().addPropertyChangeListener(this);
 //			((GridView)component.getComponent()).setParentView(this);
 			gridComponents.add((GridComponent) component);
 			break;
@@ -308,18 +299,18 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 		component.setFieldDetail(field);
 		component.setReadOnly(field.getReadOnly());
 
-		if(!field.getType().equals(Input.ENTITY)) {
+		if (!field.getType().equals(Input.ENTITY)) {
 			binder.forField(component).bind(field.getName());
 		}
-		
+
 		component.getContainer().getElement().getStyle().set("padding-top", "var(--lumo-space-m)");
 		componentsByField.put(field, component);
 		formComponents.add(component);
 		formLayout.add(component.getContainer());
 	}
 
-	private void createEditorLayout( ) {
-		
+	private void createEditorLayout() {
+
 		Div panelDiv = new Div();
 		createButtonLayout(panelDiv);
 		panelDiv.setId("editor-layout");
@@ -355,12 +346,10 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 		headerLayout.setWidthFull();
 		headerLayout.setSpacing(true);
 
-		btnCancel = new Button( new Icon(VaadinIcon.CLOSE_CIRCLE));
-		btnSave = new Button( new Icon(VaadinIcon.CHECK_CIRCLE));
-		btnDelete = new Button( new Icon(VaadinIcon.TRASH));
-		
-	
-		
+		btnCancel = new Button(new Icon(VaadinIcon.CLOSE_CIRCLE));
+		btnSave = new Button(new Icon(VaadinIcon.CHECK_CIRCLE));
+		btnDelete = new Button(new Icon(VaadinIcon.TRASH));
+
 		btnCancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 		btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		btnDelete.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -370,9 +359,7 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 		buttonLayout.getClassNames().add("button-layout");
 		labelLayout.getClassNames().add("label-layout");
 
-		btnDelete.addClickListener(c -> 
-			deleteDisplayable()
-		);
+		btnDelete.addClickListener(c -> deleteDisplayable());
 
 		btnCancel.addClickShortcut(Key.ESCAPE);
 		btnSave.addClickShortcut(Key.F2);
@@ -380,17 +367,17 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 
 		btnCancel.addClickListener(e -> {
 //			btnCancel.clickInClient();
-			ViewState closeViewState = new ViewState(this, EViewEventType.CLOSE, currentDisplayable,
-					viewClazz);
-			propertyChangeSupport.firePropertyChange(ESplitViewEvents.VIEW_STATE.getValue(), currentViewState,closeViewState);
+			ViewState closeViewState = new ViewState(this, EViewEventType.CLOSE, currentDisplayable, viewClazz);
+			propertyChangeSupport.firePropertyChange(ESplitViewEvents.VIEW_STATE.getValue(), currentViewState,
+					closeViewState);
 
 		});
 
 		btnSave.addClickListener(e -> {
 			saveDisplayable();
-			ViewState saveViewState = new ViewState(this, EViewEventType.SAVE, currentDisplayable,
-					viewClazz);
-			propertyChangeSupport.firePropertyChange(ESplitViewEvents.VIEW_STATE.getValue(), currentViewState, saveViewState);
+			ViewState saveViewState = new ViewState(this, EViewEventType.SAVE, currentDisplayable, viewClazz);
+			propertyChangeSupport.firePropertyChange(ESplitViewEvents.VIEW_STATE.getValue(), currentViewState,
+					saveViewState);
 
 		});
 		headerLayout.add(labelLayout, buttonLayout);
@@ -400,13 +387,12 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 	private void deleteDisplayable() {
 		if (currentDisplayable != null) {
 //			persistDeleteDisplayable();
-			ViewState deleteViewState = new ViewState(this, EViewEventType.DELETE, currentDisplayable,
-					viewClazz);
-			propertyChangeSupport.firePropertyChange(ESplitViewEvents.VIEW_STATE.getValue(), currentViewState, deleteViewState);
-			
+			ViewState deleteViewState = new ViewState(this, EViewEventType.DELETE, currentDisplayable, viewClazz);
+			propertyChangeSupport.firePropertyChange(ESplitViewEvents.VIEW_STATE.getValue(), currentViewState,
+					deleteViewState);
+
 		}
 	}
-
 
 	public void persistDeleteDisplayable() {
 		displayableService.delete(currentDisplayable);
@@ -434,36 +420,37 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 		}
 		try {
 
-			application.getAction().stream().filter(a -> 
-				 a.getActionType().equals(ActionType.SUBMIT) & a.isBefore()
-			).forEach(a -> {
-				if (a.getUpdates() != null) {
+			application.getAction().stream().filter(a -> a.getActionType().equals(ActionType.SUBMIT) & a.isBefore())
+					.forEach(a -> {
+						if (a.getUpdates() != null) {
 
-					Iterator<Entry<FieldDetail, Object>> updates = a.getUpdates().entrySet().iterator();
+							Iterator<Entry<FieldDetail, Object>> updates = a.getUpdates().entrySet().iterator();
 
-					while (updates.hasNext()) {
-						Entry<FieldDetail, Object> entry = updates.next();
-						FieldDetail field = entry.getKey();
-						Object updatedValue = field.getDefaultValue();
+							while (updates.hasNext()) {
+								Entry<FieldDetail, Object> entry = updates.next();
+								FieldDetail field = entry.getKey();
+								Object updatedValue = field.getDefaultValue();
 
-						if(updatedValue instanceof FunctionalInterfaceLocalDateTime) {
-							updatedValue = ((FunctionalInterfaceLocalDateTime) updatedValue).now();
+								if (updatedValue instanceof FunctionalInterfaceLocalDateTime) {
+									updatedValue = ((FunctionalInterfaceLocalDateTime) updatedValue).now();
+								}
+
+								SuperComponentInterface<?, ?> component = componentsByField.get(field);
+								if (component instanceof AbstractSimpleSuperComponent) {
+									((AbstractSimpleSuperComponent<Object>) componentsByField.get(field))
+											.setValue((updatedValue));
+								} else if (component instanceof AbstractSuperCustomField) {
+									((AbstractSuperCustomField) componentsByField.get(field))
+											.setValue((String) (updatedValue));
+								} else if (component instanceof AbstractSuperDisplayableComponent) {
+									((AbstractSuperDisplayableComponent) componentsByField.get(field))
+											.setValue((updatedValue));
+
+								}
+							}
 						}
-						
-						SuperComponentInterface<?, ?> component = componentsByField.get(field);
-						if (component instanceof AbstractSimpleSuperComponent) {
-							((AbstractSimpleSuperComponent<Object>) componentsByField.get(field))
-									.setValue((updatedValue));
-						} else if (component instanceof AbstractSuperCustomField) {
-							((AbstractSuperCustomField) componentsByField.get(field)).setValue((String) (updatedValue));
-						} else if (component instanceof AbstractSuperDisplayableComponent) {
-							((AbstractSuperDisplayableComponent) componentsByField.get(field)).setValue((updatedValue));
 
-						}
-					}
-				}
-
-			});
+					});
 
 			binder.writeBean(currentDisplayable);
 
@@ -474,156 +461,147 @@ public class DetailView extends SingleView implements PropertyChangeListener{
 
 			populateForm(currentDisplayable);
 
-
 		} catch (ValidationException e1) {
 			e1.printStackTrace();
 		}
 	}
 
-
-
 	public void persitDisplayable() {
-		
-		this.getChildrenChangedToPersist().forEach(d ->{
+
+		this.getChildrenChangedToPersist().forEach(d -> {
 			d.persitDisplayable(this);
 		});
-		
+
 		currentDisplayable.persitDisplayable(this);
-		
-		
+
 		currentDisplayable.updateLinks(this);
-		
-		this.getChildrenChangedToPersist().forEach(d ->{
+
+		this.getChildrenChangedToPersist().forEach(d -> {
 			d.updateLinks(this);
 		});
-		
-	}
 
+	}
 
 	public Optional<Field> findFieldListOfModel(Class<? extends Displayable> model) {
-		Optional<Field> optField = Arrays.asList(getEntityClazz().getDeclaredFields()).stream().filter(field ->{
-			  Type type =  field.getGenericType();
-			  if(type instanceof ParameterizedType) {
-				  ParameterizedType listArguments = (ParameterizedType) type;
-				  if(listArguments != null && listArguments.getActualTypeArguments().length > 0) {
-				        Class<?> entity = (Class<?>) listArguments.getActualTypeArguments()[0];
-				        if(entity.equals(model)) {
-				        	return true;
-				        }
-					  }
-			  }
-			 
-		      return false;
+		Optional<Field> optField = Arrays.asList(getEntityClazz().getDeclaredFields()).stream().filter(field -> {
+			Type type = field.getGenericType();
+			if (type instanceof ParameterizedType) {
+				ParameterizedType listArguments = (ParameterizedType) type;
+				if (listArguments != null && listArguments.getActualTypeArguments().length > 0) {
+					Class<?> entity = (Class<?>) listArguments.getActualTypeArguments()[0];
+					if (entity.equals(model)) {
+						return true;
+					}
+				}
+			}
+
+			return false;
 		}).findFirst();
 		return optField;
 	}
-	
-	public Optional<Field> findFieldOfChild(Class<? extends Displayable> model, Class<? extends Displayable> childClazz) {
-		Optional<Field> optField = Arrays.asList(childClazz.getDeclaredFields()).stream().filter(field ->{
-			 
-			  if(field.getType().getClass().equals(model)) {
-				 
-				        	return true;
-					  
-			  }
-			 
-		      return true;
+
+	public Optional<Field> findFieldOfChild(Class<? extends Displayable> model,
+			Class<? extends Displayable> childClazz) {
+		Optional<Field> optField = Arrays.asList(childClazz.getDeclaredFields()).stream().filter(field -> {
+
+			if (field.getType().getClass().equals(model)) {
+
+				return true;
+
+			}
+
+			return true;
 		}).findFirst();
 		return optField;
 	}
-	
-	
+
 	private Optional<Field> findCurrentDisplayableOfModel(Class<? extends Displayable> model) {
-		Optional<Field> optEntity = Arrays.asList(model.getDeclaredFields()).stream().filter(field ->{
-			if(field.getType().equals(getEntityClazz())) {
+		Optional<Field> optEntity = Arrays.asList(model.getDeclaredFields()).stream().filter(field -> {
+			if (field.getType().equals(getEntityClazz())) {
 				return true;
 			}
-			 
-		      return false;
+
+			return false;
 		}).findFirst();
 		return optEntity;
 	}
-	
+
 	@Override
 	protected void onAttach(AttachEvent attachEvent) {
 		super.onAttach(attachEvent);
 		loadLazyComponents();
 	}
 
-
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {		
+	public void propertyChange(PropertyChangeEvent evt) {
 		this.propertyChangeSupport.firePropertyChange(evt);
 	}
-	
+
 	public void refreshGridComponentOfContext(ViewState viewState, boolean delete) {
-		for(GridComponent gridComp : this.gridComponents) {
-			
-			if(gridComp.getContext().equals(viewState.getContext())) {
-				
+		for (GridComponent gridComp : this.gridComponents) {
+
+			if (gridComp.getContext().equals(viewState.getContext())) {
+
 //				int indexOfSavedDisplayable = ((GridView)gridComp.getComponent()).getDisplayables().indexOf(viewState.getCurrentDisplayable()); 
-				int indexOfSavedDisplayableFiltered = ((GridView)gridComp.getComponent()).getDisplayables().indexOf(viewState.getCurrentDisplayable()); 
-				
-				if(indexOfSavedDisplayableFiltered != -1) {
-					if(delete) {
-						((GridView)gridComp.getComponent()).getDisplayables().remove(viewState.getCurrentDisplayable());
-					}else {
-						((GridView)gridComp.getComponent()).getDisplayables().set(indexOfSavedDisplayableFiltered, viewState.getCurrentDisplayable());
+				int indexOfSavedDisplayableFiltered = ((GridView) gridComp.getComponent()).getDisplayables()
+						.indexOf(viewState.getCurrentDisplayable());
+
+				if (indexOfSavedDisplayableFiltered != -1) {
+					if (delete) {
+						((GridView) gridComp.getComponent()).getDisplayables()
+								.remove(viewState.getCurrentDisplayable());
+					} else {
+						((GridView) gridComp.getComponent()).getDisplayables().set(indexOfSavedDisplayableFiltered,
+								viewState.getCurrentDisplayable());
 					}
-				}else if(!delete){
-					List<Displayable> data = new ArrayList<>(((GridView)gridComp.getComponent()).getDisplayables());
+				} else if (!delete) {
+					List<Displayable> data = new ArrayList<>(((GridView) gridComp.getComponent()).getDisplayables());
 					data.add(0, viewState.getCurrentDisplayable());
-					((GridView)gridComp.getComponent()).getGrid().setItems(data);
+					((GridView) gridComp.getComponent()).getGrid().setItems(data);
 				}
-				
-				((GridView)gridComp.getComponent()).refreshGrid();
+
+				((GridView) gridComp.getComponent()).refreshGrid();
 			}
 		}
 	}
+
 	/**
 	 * Assuming there is only one gridView of each type !
+	 * 
 	 * @param context
 	 */
 	public GridView findGridComponentOfContext(Class<? extends Application> context) {
-		Optional<GridComponent> optComponent = this.gridComponents.stream().filter(g -> g.getContext().equals(context)).findFirst();
-		if(optComponent.isPresent()) {
+		Optional<GridComponent> optComponent = this.gridComponents.stream().filter(g -> g.getContext().equals(context))
+				.findFirst();
+		if (optComponent.isPresent()) {
 			return (GridView) optComponent.get().getComponent();
-		}else {
+		} else {
 			return null;
 		}
 	}
-
 
 	public List<GridComponent> getGridComponents() {
 		return gridComponents;
 	}
 
-
 	public void setGridComponents(List<GridComponent> gridComponents) {
 		this.gridComponents = gridComponents;
 	}
-
 
 	public List<Displayable> getChildrenChangedToPersist() {
 		return childrenChangedToPersist;
 	}
 
-
 	public void setChildrenChangedToPersist(List<Displayable> childrenChangedToPersist) {
 		this.childrenChangedToPersist = childrenChangedToPersist;
 	}
-
 
 	public Displayable getCurrentDisplayable() {
 		return currentDisplayable;
 	}
 
-
 	public void setCurrentDisplayable(Displayable currentDisplayable) {
 		this.currentDisplayable = currentDisplayable;
 	}
-	
-	
-	
-	
+
 }

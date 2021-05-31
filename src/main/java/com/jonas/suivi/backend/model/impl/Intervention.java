@@ -16,6 +16,10 @@ import com.jonas.suivi.backend.model.Displayable;
 @Entity
 public class Intervention implements Serializable, Displayable {
 
+	
+
+	private static final long serialVersionUID = 1310634077281346205L;
+	
 	@Id
 	@GeneratedValue
 	Long id;
@@ -55,6 +59,12 @@ public class Intervention implements Serializable, Displayable {
 		this.setDescription(value);
 	}
 
+	@Override
+	public Integer getState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public String getDescription() {
 		return description;
 	}

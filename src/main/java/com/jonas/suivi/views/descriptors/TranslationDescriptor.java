@@ -17,7 +17,7 @@ import com.jonas.suivi.views.model.TableLayoutManager;
 @MainEntity(Translation.class)
 public class TranslationDescriptor extends Application {
 
-	public static final String appPAth = "/translations";
+	public static final String appPAth = "translations";
 	
 	public TranslationDescriptor() {
 		super();

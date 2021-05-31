@@ -24,7 +24,7 @@ public interface Displayable extends Serializable{
 	
 	public void setSimpleValue(String value);
 	
-//	public void setValue();
+	public Integer getState();
 	
 	public default  String getClazz() {
 		return Displayable.class.getCanonicalName();

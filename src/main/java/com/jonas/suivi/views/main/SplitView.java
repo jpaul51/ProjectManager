@@ -274,7 +274,7 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 				if (nextViewToOpen.getChildren().isEmpty()
 						&& !vh.getCurrent().getCtx().equals(nextViewToOpen.getCurrent().getCtx())) {
 
-					if (oldViewState.isSenderSingleView()) {
+					if (oldViewState.isSenderSingleView() ) {
 						((DetailView) parentView.getCurrent()).findGridComponentOfContext(vh.getCurrent().getCtx())
 								.selectItem(null);
 					}
@@ -439,7 +439,8 @@ public class SplitView extends AbstractView implements HasUrlParameter<String>, 
 	private ViewHistory findLastGridLeftViewOfCtx(ViewHistory fromView, Class<? extends Application> context) {
 		if (fromView.getParent() != null) {
 			if (!fromView.getParent().isRight() && fromView.getParent().isGridView()
-					&& fromView.getParent().getCurrent().getCtx().equals(context)) {
+//					&& fromView.getParent().getCurrent().getCtx().equals(context)
+					) {
 				return fromView.getParent();
 			} else {
 				return findLastGridLeftViewOfCtx(fromView.getParent(), context);

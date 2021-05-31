@@ -10,6 +10,9 @@ import com.jonas.suivi.backend.model.Displayable;
 @Entity
 public class UserAccount implements Displayable{
 	
+
+	private static final long serialVersionUID = -4999478321898226478L;
+	
 	@Id @GeneratedValue
 	Long id;
 	@Column(unique = true) 
@@ -55,7 +58,11 @@ public class UserAccount implements Displayable{
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+	@Override
+	public Integer getState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 	

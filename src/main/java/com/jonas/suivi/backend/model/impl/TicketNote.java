@@ -8,6 +8,9 @@ import com.jonas.suivi.backend.model.Displayable;
 @Entity
 public class TicketNote extends Note implements Displayable {
 
+
+	private static final long serialVersionUID = 7910722885513920217L;
+	
 	@ManyToOne
 	private Ticket ticket;
 
@@ -27,5 +30,14 @@ public class TicketNote extends Note implements Displayable {
 	public void setSimpleValue(String value) {
 		this.setData(value);
 	}
-	
+	@Override
+	public Long getId() {
+		// TODO Auto-generated method stub
+		return super.getId();
+	}
+	@Override
+	public Integer getState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
