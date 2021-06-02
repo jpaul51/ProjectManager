@@ -1,23 +1,24 @@
-server.port=${PORT:8080}
-logging.level.org.atmosphere = warn
-spring.mustache.check-template-location = false
-
-
-spring.database.driverClassName=org.postgresql.Driver
+server.port: ${PORT:8080}
+logging.level.org.atmosphere: warn
+spring.mustache.check-template-location: false
 
 
 
-spring.jpa.database=POSTGRESQL
-spring.datasource.platform=postgres
-spring.jpa.show-sql=false 
+
+spring:
+  jpa:
+    database: POSTGRESQL
+    how-sql: false
+    hibernate.ddl-auto: update
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/project_manager
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  database.driverClassName: org.postgresql.Driver
 
 
-spring.datasource.url= jdbc:postgresql://localhost:5432/project_manager
-spring.datasource.username=postgres
-spring.datasource.password=
+jwt.secret: ${JWT_TOKEN}
 
-spring.jpa.hibernate.ddl-auto=update
 
-# To improve the performance during development. 
-# For more information https://vaadin.com/docs/flow/spring/tutorial-spring-configuration.html#special-configuration-parameters
-# vaadin.whitelisted-packages= org/vaadin/example
