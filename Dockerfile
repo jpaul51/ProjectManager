@@ -1,8 +1,10 @@
-FROM debian
-#ARG MAVEN_VERSION=3.6.3
-RUN apt-get -y update && apt-get -y upgrade
+FROM debian:buster
+
+RUN apt -y  update
 RUN apt -y install curl
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+#ADD https://deb.nodesource.com/setup_12.x setup.sh
+#RUN bash setup.sh
 RUN apt -y install nodejs
 
 # Stop running as root at this point
@@ -29,10 +31,12 @@ COPY --chown=jopa:jopa package.json  webpack.config.js ./
 
 # Build the production package, assuming that we validated the version before so no need for running tests again
 RUN mvn clean package -DskipTests -Pproduction
-
+RUN chown jopa:jopa /usr/src/app/target/
 # Running stage: the part that is used for running the application
-RUN ls target
-COPY target/projectmanager-1.2.0.jar  /usr/app/app.jar
+RUN ls -al target
+#COPY target/projectmanager-1.2.0.jar  /usr/app/app.jar
+RUN cp /usr/src/app/target/projectmanager-1.2.0.jar  /usr/src/app/app.jar
+RUN chown jopa:jopa /usr/src/app/app.jar
 USER jopa
 EXPOSE 8080
-CMD java -jar /usr/app/app.jar
+CMD java -jar app.jar
