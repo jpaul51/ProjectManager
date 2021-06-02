@@ -3,6 +3,9 @@
 .settings
 .project
 .classpath
+.env*
+env.yaml
+.vscode
 
 *.iml
 .DS_Store
